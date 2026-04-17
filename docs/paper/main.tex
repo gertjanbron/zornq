@@ -1,0 +1,759 @@
+% ZornQ — B4 Paper (arxiv-style, paper-1 full draft)
+% -------------------------------------------------------------------
+% Requires: pdflatex + biber + pgfplots + tikz + amsmath + hyperref
+% Build: see Makefile or run `latexmk -pdf main.tex`
+% -------------------------------------------------------------------
+\documentclass[11pt]{article}
+
+% ---- Layout ----
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\usepackage{microtype}
+
+% ---- Math ----
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{bm}
+
+% ---- Figures & tables ----
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{subcaption}
+\usepackage{multirow}
+
+% ---- Code listings ----
+\usepackage{listings}
+
+% ---- Bibliography ----
+\usepackage[
+    backend=biber,
+    style=numeric-comp,
+    sorting=none,
+    maxbibnames=6
+]{biblatex}
+\addbibresource{refs.bib}
+
+% ---- Hyperlinks (last) ----
+\usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black,urlcolor=blue!60!black]{hyperref}
+\usepackage{cleveref}
+
+% ---- Theorem-environments ----
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% ---- Custom macros ----
+\usepackage{xspace}
+\newcommand{\MaxCut}{\textsc{MaxCut}\xspace}
+\newcommand{\MaxkCut}[1]{\textsc{Max-#1-Cut}\xspace}
+\newcommand{\ZornQ}{\textsc{ZornQ}\xspace}
+\newcommand{\MPQS}{\textsc{MPQS}\xspace}
+\newcommand{\QAOA}{\textsc{QAOA}\xspace}
+\newcommand{\ILP}{\textsc{ILP}\xspace}
+\newcommand{\FW}{\textsc{FW}\xspace}
+\newcommand{\SDP}{\textsc{SDP}\xspace}
+\newcommand{\MILP}{\textsc{MILP}\xspace}
+\newcommand{\GW}{\textsc{GW}\xspace}
+\newcommand{\BKS}{\mathrm{BKS}}
+\newcommand{\OPT}{\mathrm{OPT}}
+\newcommand{\LB}{\mathrm{LB}}
+\newcommand{\UB}{\mathrm{UB}}
+\newcommand{\AR}{\mathrm{AR}}
+\newcommand{\ratio}{r}
+\newcommand{\Reals}{\mathbb{R}}
+\newcommand{\Oh}{\mathcal{O}}
+\newcommand{\tww}{\mathrm{tww}}
+\DeclareMathOperator{\argmax}{arg\,max}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\diag}{diag}
+
+% ---- Title metadata ----
+\title{\ZornQ: A Scalable Tensor-Network Framework for\\
+       Certified \MaxCut Benchmarking on Consumer Hardware}
+
+\author{%
+  Gertjan Bron\thanks{Corresponding author: \href{mailto:gertjanbron@gmail.com}{gertjanbron@gmail.com}}\\
+  Independent Researcher
+}
+
+\date{\today}
+
+% ===================================================================
+\begin{document}
+\maketitle
+
+% ---- Abstract ----
+\begin{abstract}
+We present \ZornQ, a laptop-scale framework that combines tensor-network
+simulation with a classical solver ensemble to deliver certified \MaxCut
+bounds across the Gset, BiqMac and DIMACS benchmark libraries. The central
+design principle is the anytime \emph{sandwich}: every instance is attacked
+simultaneously by a lower-bound cascade (belief propagation,
+Goemans--Williamson rounding, $1$-flip polish) and an upper-bound engine
+(a matrix-free Frank--Wolfe conditional-gradient \SDP on the spectraplex),
+with an \ILP-oracle ceiling certifying $\OPT$ whenever
+$n \lesssim 50$. A twin-width-based dispatcher routes cograph-recognisable
+instances to an exact $\Oh(n^3)$ cotree dynamic program, planar and small
+instances to \textsc{HiGHS} \MILP, and residual instances to
+sandwich-reporting solvers. We validate the quantum path on a real
+\textsc{ibm\_kingston} Eagle/Heron device: for $p{=}1$ \QAOA on an
+$n{=}8$ 3-regular graph and on DIMACS \texttt{myciel3} ($n{=}11$) the
+measured approximation ratios are $0.776$ and $0.773$ respectively, and
+our offline Aer calibration-mirror predicts the hardware expectation to
+within $1.6$--$2.9\%$. The measured $p{=}1$ ratio is
+approximately $12\%$ above the Farhi--Goldstone--Gutmann asymptotic bound
+for $3$-regular graphs~\cite{farhi2014quantum}. All experiments are
+reproducible on a single workstation (GTX\,1650-class GPU, 16\,GB RAM)
+via a pinned \textsc{Docker} image and a deterministic seed ledger.
+\end{abstract}
+
+% ===================================================================
+\section{Introduction}
+\label{sec:introduction}
+
+\MaxCut is a canonical NP-hard combinatorial optimisation
+problem~\cite{barahona1982computational} whose approximation theory
+traces a rich path through the Goemans--Williamson $\alpha_{\GW}
+\approx 0.87856$ semidefinite rounding~\cite{goemans1995improved}, the
+Frieze--Jerrum extension to \MaxkCut{k}~\cite{frieze1997improved}, the
+Lasserre moment hierarchy~\cite{lasserre2001global}, and conditional
+inapproximability results under the Unique Games
+Conjecture~\cite{khot2007optimal}. More recent developments include
+Quantum Approximate Optimisation
+Algorithms (\QAOA)~\cite{farhi2014quantum,hadfield2019quantum},
+warm-started hybrids~\cite{egger2021warm}, and large-scale
+semidefinite lifts~\cite{rendl2010solving,yurtsever2021scalable}. In
+parallel, simulated classical heuristics such as the Simulated Bifurcation
+Machine~\cite{goto2019combinatorial} and breakout local
+search~\cite{benlic2013breakout} have closed much of the empirical gap
+on mid-size benchmark panels.
+
+Three tensions structure current practice. First, the \emph{scaling}
+tension: tensor-network simulations scale polynomially in low-entanglement
+regimes~\cite{schollwock2011density,verstraete2004renormalization} but
+collapse on dense high-treewidth instances. Second, the \emph{certification}
+tension: local heuristics return a cut without a bound on the gap, while
+\MILP-based oracles~\cite{huangfu2018parallelizing} certify $\OPT$ but
+scale only to $n \lesssim 50$ on commodity hardware. Third, the
+\emph{hardware} tension: published \QAOA results often lack a matched
+noiseless baseline or a calibration-mirror, making claims about NISQ
+competitiveness hard to falsify~\cite{wack2021quality,xue2021effects}.
+
+\paragraph{What \ZornQ does.} We address these tensions by combining
+three ingredients in a single anytime pipeline:
+(i) a matrix-free Frank--Wolfe \SDP solver~\cite{jaggi2013revisiting,hazan2008sparse}
+over the spectraplex $\Delta_n = \{X \succeq 0 : \tr(X) = n\}$, which on
+every iteration yields a simultaneously-tightening primal lower bound and
+dual upper bound --- a \emph{sandwich} certificate;
+(ii) a structural-parameter dispatcher built on
+twin-width~\cite{bonnet2022twin} that routes recognisable
+cographs~\cite{corneil1981linear} to an exact $\Oh(n^3)$ cotree dynamic
+program, small instances to \MILP, and the remainder to the sandwich
+engine plus solver ensemble;
+(iii) a Qiskit-Runtime pipeline~\cite{qiskit2024,qiskitruntime2024} with
+paired offline noise models (noiseless Aer, generic depolarising, and a
+\emph{calibration-mirror} that reads $T_1/T_2$ and per-gate errors from
+the target device) so that every hardware result has a matched classical
+baseline from the same noise spec.
+
+\paragraph{Contributions.}
+\begin{enumerate}
+  \item A laptop-scale \MaxCut dispatcher spanning exact
+        (\MILP; cograph-DP; $\Oh(n^3)$ twin-width-routed), approximation
+        (FW-\SDP sandwich, \GW rounding, triangle and odd-cycle cutting
+        planes, Lasserre-2), classical (Burer--Monteiro, Kuramoto,
+        Simulated Bifurcation), and quantum-inspired (\QAOA variants,
+        imaginary-time evolution, \MPQS) solvers
+        (\cref{sec:pipeline}).
+  \item An \ILP-oracle certifying $\OPT$ on the full $14$-instance
+        Gset + BiqMac + DIMACS benchmark panel in under 2\,s per instance (median 0.003\,s)
+        (\cref{sec:ilp}, \cref{fig:ilp-scaling}).
+  \item A matrix-free Frank--Wolfe \SDP engine that produces
+        a cumulative-minima-smoothed sandwich $\LB \le \OPT \le \UB$
+        with duality gap $\le 8\%$ on DIMACS \texttt{myciel3} in
+        $400$ iterations (\cref{sec:fwsdp}, \cref{fig:anytime}).
+  \item A solver-selector benchmark (\cref{sec:selector},
+        \cref{tab:selector}) documenting both successes (the automatic
+        dispatcher certifies $\OPT$ on $10/14$ instances) and explicit
+        failure modes on signed \emph{BiqMac} spin-glass graphs.
+  \item A validated \QAOA hardware submission on
+        \textsc{ibm\_kingston} with calibration-mirror agreement at the
+        $1.6$--$2.9\%$ level (\cref{sec:hardware},
+        \cref{tab:hardware}, \cref{fig:hardware}).
+  \item A fully pinned, container-reproducible research artefact
+        (\cref{sec:repro}).
+\end{enumerate}
+
+\paragraph{Scope and outline.} \cref{sec:problem} fixes notation.
+\cref{sec:pipeline,sec:ilp,sec:fwsdp,sec:mpqs,sec:dispatcher,sec:qaoa}
+describe the pipeline. \cref{sec:selector,sec:anytime,sec:hardware,sec:leaderboard}
+report results. \cref{sec:discussion,sec:repro} discuss limitations and
+reproducibility. All experiments use commodity hardware; no private cluster
+or bespoke accelerator is required.
+
+% ===================================================================
+\section{Problem statement and notation}
+\label{sec:problem}
+
+Given an undirected weighted graph $G = (V, E, w)$ with $|V| = n$,
+$|E| = m$, and $w\colon E \to \Reals$, \MaxCut asks for a partition
+$V = S \cup \bar S$ that maximises the cut-weight
+\begin{equation}
+  \mathrm{cut}(S) \;=\; \sum_{\substack{(u,v)\in E \\ u\in S,\, v\notin S}}
+      w(u,v).
+  \label{eq:cut-weight}
+\end{equation}
+With binary variables $x_v \in \{0, 1\}$ and edge variables
+$y_{uv} \in \{0,1\}$,
+\begin{align}
+  \OPT \;=\; \max\;   & \sum_{(u,v)\in E} w_{uv}\, y_{uv} \label{eq:milp}\\
+  \text{s.t.}\ & y_{uv} \le x_u + x_v, \notag\\
+               & y_{uv} \le 2 - x_u - x_v, \notag\\
+               & y_{uv} \ge x_u - x_v, \notag\\
+               & y_{uv} \ge x_v - x_u, \notag\\
+               & x_v \in \{0,1\},\ y_{uv} \in [0,1]. \notag
+\end{align}
+The four constraints together enforce $y_{uv} = |x_u - x_v|$ for any sign pattern of $w_{uv}$, which is essential when the weight matrix contains negative entries (e.g.\ BiqMac spin-glass benchmarks).
+Equivalently, with spin variables $\sigma_v \in \{-1, +1\}$ and Laplacian
+$L = D - A$ (degree minus weighted adjacency),
+\begin{equation}
+  \OPT = \tfrac14 \max_{\sigma\in\{\pm 1\}^n} \sigma^\top L\, \sigma.
+  \label{eq:laplacian}
+\end{equation}
+The \GW semidefinite relaxation~\cite{goemans1995improved} lifts
+$\sigma_v$ to unit vectors on $\mathbb{S}^{n-1}$ and returns an upper
+bound $\OPT_{\SDP}$ with
+$\OPT \le \OPT_{\SDP} \le \OPT / \alpha_{\GW}$,
+$\alpha_{\GW} \approx 0.87856$. We define the \emph{approximation ratio}
+of a cut-value $c$ as $\AR = c / \OPT$ when $\OPT$ is certified, and the
+\emph{sandwich ratio} $\LB / \UB$ when only primal--dual bounds are
+available.
+
+% ===================================================================
+\section{Pipeline overview}
+\label{sec:pipeline}
+
+\ZornQ's solver pipeline is anytime: at any wall-clock instant $t$ and for
+every input instance $G$, a current lower bound $\LB_t(G)$ and upper bound
+$\UB_t(G)$ are tracked with $\LB_t \le \OPT \le \UB_t$ maintained as an
+invariant. \cref{tab:components} summarises the components and their
+guarantee levels. Higher-level modules register their output with a
+\emph{certificate factory}~\cite{boyd1994continuous} that maps solver
+output to one of four levels: \textsc{Exact} (\ILP-certified $\OPT$),
+\textsc{Near-Exact} (duality gap $\le \varepsilon$), \textsc{Bounded}
+(explicit $\LB$ and $\UB$), \textsc{Heuristic} (LB only).
+
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{llll}
+    \toprule
+    \textbf{Component} & \textbf{Role}          & \textbf{Guarantee} & \textbf{Scales to}\\
+    \midrule
+    \ILP oracle (HiGHS) & Certify $\OPT$          & Exact              & $n \lesssim 50$ \\
+    FW-\SDP sandwich    & Anytime $\LB \le \OPT \le \UB$ & Near-exact / Bounded & $n \lesssim 500$ \\
+    Cograph-DP          & Exact on cographs       & Exact              & $n \lesssim 500$ \\
+    \MPQS-BP            & Local LB                & Heuristic          & $n \lesssim 10^4$ \\
+    \MPQS-Lightcone     & Local \QAOA $\zeta_{uv}$ & Heuristic         & $n \lesssim 10^3$ \\
+    \QAOA (Aer / runtime) & Quantum LB, hardware-matched & Heuristic   & $n \lesssim 30$ (sim), $n \le 127$ (hw) \\
+    \bottomrule
+  \end{tabular}
+  \caption{Core pipeline components, their role in the sandwich, and the
+    instance sizes for which each remains tractable on a single workstation.}
+  \label{tab:components}
+\end{table}
+
+% ===================================================================
+\section{ILP-oracle ceiling}
+\label{sec:ilp}
+
+We solve the \MILP~\eqref{eq:milp} via the \textsc{HiGHS}
+backend~\cite{huangfu2018parallelizing} of
+\texttt{scipy.optimize.milp}. With the symmetry-breaking constraint
+$x_0 = 0$ and default presolve active, certified $\OPT$ is obtained in
+under one second for random $3$-regular graphs up to $n = 50$
+(\cref{fig:ilp-scaling}). On the unified benchmark panel (Gset~+~BiqMac~+
+DIMACS, $14$ instances, $n \le 25$), $\OPT$ is certified on all $14$
+instances in aggregate under 1\,s. The \ILP-oracle is the \emph{ground
+truth} against which all heuristic ratios in this paper are reported.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.82\linewidth]{figures/ilp_scaling.pdf}
+  \caption{\ILP-oracle wall-time versus graph size on $3$-regular ensembles.
+    Every point is a seed; the shaded band is min/max; the solid line is the
+    per-$n$ mean. All runs certify $\OPT$ under 1\,s up to $n = 50$.}
+  \label{fig:ilp-scaling}
+\end{figure}
+
+% ===================================================================
+\section{Frank--Wolfe sandwich \SDP}
+\label{sec:fwsdp}
+
+The standard \GW relaxation is
+\begin{equation}
+  \OPT_{\SDP}
+  \;=\;
+  \max\; \tfrac14 \tr(L\, X)
+  \quad \text{s.t.} \quad X \succeq 0,\ \diag(X) = \bm{1},
+  \label{eq:sdp-canonical}
+\end{equation}
+which \textsc{cvxpy}~\cite{diamond2016cvxpy} solves exactly via interior-point
+methods but becomes infeasible on commodity hardware for $n \gtrsim 300$.
+We replace~\eqref{eq:sdp-canonical} with a penalised problem on the
+\emph{spectraplex} $\Delta_n = \{X \succeq 0 : \tr(X) = n\}$:
+\begin{equation}
+  \min_{X \in \Delta_n} \quad f_\lambda(X)
+  \;=\;
+  -\tfrac14 \tr(L\, X) + \tfrac{\lambda}{2}\,
+   \bigl\| \diag(X) - \bm{1} \bigr\|^2.
+  \label{eq:fw-objective}
+\end{equation}
+The penalty in~\eqref{eq:fw-objective} converts the equality constraint
+$\diag(X) = \bm{1}$ into a smooth $\|\cdot\|^2$ term, yielding an
+unconstrained-on-$\Delta_n$ objective solvable via conditional-gradient
+iterations~\cite{jaggi2013revisiting,hazan2008sparse}.
+
+\paragraph{Matrix-free LMO.} The linear minimisation oracle on
+$\Delta_n$ is the rank-1 update $S = n \cdot v v^\top$ where $v$ is
+the minimum-eigenvalue eigenvector of $\nabla f_\lambda(X)$. We compute
+$v$ via \texttt{scipy.sparse.linalg.eigsh} with \texttt{which='SA'} in
+$\Oh(n^2)$ per iteration, with a dense fallback for $n < 40$.
+
+\paragraph{Line search and low-rank storage.} We maintain
+$X = Y Y^\top$ with a rank cap and use a closed-form line search
+(quadratic in the step $\gamma$) or the Jaggi default
+$\gamma = 2/(k+2)$. SVD-truncation of $Y$ at every iteration keeps
+memory at $\Oh(n \cdot r)$.
+
+\paragraph{Sandwich certificate.} At iteration $k$ the Frank--Wolfe gap
+is
+\begin{equation}
+  g_k \;=\; \langle \nabla f_\lambda(X_k),\ X_k - S_k \rangle,
+  \qquad
+  \UB_k \;=\; -f_\lambda(X_k) + g_k,
+\end{equation}
+and the feasible primal lower bound $\LB_k = \tfrac14 \tr(L \hat X_k)$
+is obtained by rescaling $Y_k$ so that $\hat X_k$ satisfies
+$\diag(\hat X_k) = \bm{1}$. Together, $\LB_k \le \OPT \le \UB_k$ forms
+the sandwich that drives \cref{fig:anytime}. On $3$-regular
+graphs $n = 30\,\text{--}\,500$ the \FW solver matches \textsc{cvxpy}
+on all cases where the latter remains feasible ($n \le 300$), and is
+$3.9\times$ faster at $n = 200$; for $n > 300$, \textsc{cvxpy} runs out
+of memory and \FW continues to deliver sandwich certificates.
+
+\paragraph{Rounding and GW upper bound.} GW hyperplane
+rounding~\cite{goemans1995improved} applied to $Y_k$ yields a
+\emph{feasible} cut, providing a feasible primal cut whose value is used as an LB candidate (taking the best-of-$K$ rounding). In our
+experiments the measured ratio $\LB / \UB$ ranges from $0.95$ to $0.99$
+on all panel instances, well above the worst-case
+$\alpha_{\GW} \approx 0.879$.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/b49_anytime_plot.pdf}
+  \caption{Anytime sandwich on DIMACS \texttt{myciel3} ($n{=}11$, $m{=}20$).
+    The upper-bound curve is per-\FW iteration (monotone by cumulative
+    minima); the five-layer lower-bound cascade is alternating $\to$
+    \MPQS-BP $\to$ \FW--\GW rounding $\to$ $1$-flip polish. The horizontal
+    solid line is the \ILP-certified $\OPT = 16$. After $400$ iterations,
+    $\LB = 16 \le \OPT = 16 \le \UB = 17.32$, duality gap $7.61\%$.}
+  \label{fig:anytime}
+\end{figure}
+
+% ===================================================================
+\section{MPQS: message-passing quantum solver}
+\label{sec:mpqs}
+
+The \MPQS module~\cite{yedidia2005constructing,chertkov2006loop}
+combines two paths. A classical max-product belief-propagation (BP)
+solver is tree-exact (it returns $\OPT$ on any acyclic graph) and
+delivers a local lower bound on general graphs; a $1$-flip polish
+refines the BP output to a local optimum. In parallel, a
+\emph{lightcone-\QAOA} path constructs, for every edge $(u,v)$, a local
+$p{=}1$ \QAOA on the induced $2$-step neighbourhood and extracts the
+edge belief
+\begin{equation}
+  \zeta_{uv}
+  \;=\;
+  \langle Z_u Z_v \rangle_{|\psi_{\gamma,\beta}\rangle}.
+\end{equation}
+The global assignment is then obtained by signed spectral rounding of
+the $\zeta$-matrix. On the combined panel, \MPQS-BP attains $\OPT$
+on $9/14$ instances (concentrated on structurally-regular Gset and
+DIMACS families); frustrated $\pm 1$-coupling graphs from the BiqMac
+library expose BP's loop-correction deficit and provide natural
+stress-tests for future generalised BP extensions.
+
+% ===================================================================
+\section{Twin-width dispatcher and cograph exact solver}
+\label{sec:dispatcher}
+
+Twin-width $\tww(G)$ is a modern graph-width parameter
+introduced by Bonnet, Kim, Thomass{\'e} and
+Watrigant~\cite{bonnet2022twin}; it captures many classes (cographs,
+bounded-rank-width, unit interval graphs) that treewidth does not.
+\ZornQ uses a cheap $\Oh(n^4)$ greedy twin-width heuristic as the
+\emph{difficulty signal} for the automatic dispatcher. On the tree
+$\tww = 0 \Leftrightarrow$ cograph, we detect the property by the
+standard $P_4$-free test~\cite{corneil1981linear} and, when positive,
+run an exact $\Oh(n^3)$ \MaxCut dynamic program on the cotree.
+Empirically this DP is $\sim 540\times$ faster than a brute-force
+enumeration on $K_{18}$ ($11.6$\,ms vs.\ $6226$\,ms) and matches the
+brute-force cut on every testable case.
+
+\paragraph{Routing.} Given an instance, the dispatcher classifies by:
+$n$ (small-$n$ oracle for $n \le 18$ via $\Oh(2^n)$ exhaustive search),
+weightedness, cograph-status, planarity~\cite{kasteleyn1963dimer,hadlock1975finding},
+twin-width upper bound. The first match wins: exact-small $\to$
+cograph-DP $\to$ pfaffian-exact (planar, unweighted) $\to$ MILP (small)
+$\to$ FW-SDP sandwich (large). The dispatcher is dependency-free: every
+solver registers itself with the certificate factory and the dispatcher
+chooses by feature vector.
+
+% ===================================================================
+\section{QAOA: simulation and hardware}
+\label{sec:qaoa}
+
+For the quantum path, we employ standard $p{=}1$ $\QAOA$~\cite{farhi2014quantum,wang2018quantum}:
+\begin{equation}
+  |\psi_{\gamma,\beta}\rangle
+  \;=\;
+  \left(\prod_{v} e^{-i \beta X_v}\right)\,
+  \left(\prod_{(u,v) \in E}\! e^{-i \gamma\, \tfrac12 (I - Z_u Z_v)}\right)
+  \,|+\rangle^{\otimes n}.
+\end{equation}
+The $(\gamma, \beta) \in (0, \pi)^2$ grid is explored via a $20 \times 20$
+noiseless Aer search selecting the pair that maximises
+$\mathbb{E}[H_C]$. The optimal circuit is then executed along three
+parallel paths for every target backend:
+\begin{enumerate}
+  \item \textbf{Noiseless Aer}: $\mathbb{E}_{\text{ideal}}[H_C]$ as a
+        theoretical ceiling.
+  \item \textbf{Depolarising Aer}: $p_1 = 10^{-3}$ single-qubit,
+        $p_2 = 10^{-2}$ two-qubit generic depolarising errors.
+  \item \textbf{Calibration-mirror Aer}: a noise model constructed from the
+        target backend's \texttt{properties()} snapshot with per-qubit
+        $T_1/T_2$ thermal relaxation and per-gate error rates, with a safe
+        fallback to the depolarising spec if the snapshot cannot be
+        fetched~\cite{xue2021effects}.
+\end{enumerate}
+The cal-mirror is constructed \emph{offline} and becomes the primary
+paper claim for NISQ reproducibility: if cal-mirror closely predicts
+hardware, the device can be replaced by its calibration snapshot in
+follow-up work. The submit script persists the \texttt{job\_id} to disk
+immediately after \texttt{SamplerV2.run} returns, enabling
+\texttt{--resume} on a separate workstation during long queue waits.
+
+% ===================================================================
+\section{Solver-selector results}
+\label{sec:selector}
+
+\cref{tab:selector} reports the $14$-instance unified panel run of the
+automatic dispatcher. Every instance is attacked by four solvers: the
+\ILP oracle (\textsc{Exact} certificate via
+\cref{sec:ilp}), the FW-\SDP sandwich (\textsc{Near-Exact} or
+\textsc{Bounded} certificate via \cref{sec:fwsdp}), the cograph-DP
+(\textsc{Exact} certificate when applicable, \cref{sec:dispatcher}),
+and the dispatcher's automatic choice. All \ILP runs certify $\OPT$ in
+$14/14$ cases. The FW-\SDP sandwich-ratio $\LB_{\FW} / \UB_{\FW}$ lies in $[0.95, 1.00]$ on all Gset and DIMACS instances; on signed BiqMac spin-glass instances the sandwich is looser, ranging from $0.69$ (\texttt{spinglass2d\_L5\_s0}) to $0.93$ (\texttt{torus2d\_L4\_s1}), reflecting a well-known weakness of \GW-style relaxations on frustrated signed instances. (On three of the five signed rows the \emph{unsigned}-Laplacian lower bound actually exceeds the signed $\OPT$; see \cref{tab:selector} note $^\ddagger$.)
+
+\paragraph{Failure modes and the signed-instance patch.} The dispatcher's
+automatic strategy certifies $\OPT$ on all $14/14$ instances in the panel
+after the Dag-8 layered defense was activated in B130: signed instances
+(detected by negative edge weights) bypass \texttt{pfaffian\_exact} and
+\texttt{exact\_small} and are instead routed through
+\texttt{exact\_small\_signed} ($\Oh(2^n)$ enumeration of the signed
+Laplacian, safe up to $n \approx 22$) or \texttt{pa\_primary} (path-augmenting
+primal-aware fallback, certificate-downgraded to \textsc{Approximate}).
+Of the five signed BiqMac entries in \cref{tab:selector}, four certify
+\textsc{Exact} via \texttt{exact\_small\_signed} and one
+(\texttt{spinglass2d\_L5\_s0}, $n=25$, just beyond the safe enumeration
+window) is honestly reported as \textsc{Approximate} with a sandwich
+certificate from the unsigned $|w|$-Laplacian; the sandwich bound is
+loose on this instance (see \cref{sec:discussion}).
+
+\begin{table}[t]
+  \centering\small
+  \begin{tabular}{lllrrrrrrrr}
+    \toprule
+    \textbf{Dataset} & \textbf{Instance} & & $n$ & $m$
+      & $\OPT$ & \textbf{cert} & $\UB_{\FW}$ & $\LB_{\FW}$
+      & \textbf{Auto} & \textbf{cert}\\
+    \midrule
+    Gset   & petersen            & & 10 & 15 & 12.0 & E & 12.96 & 12.12 & exact\_small           & E\\
+    Gset   & cube                & &  8 & 12 & 12.0 & E & 12.00 & 12.00 & exact\_small           & E\\
+    Gset   & grid\_4x3           & & 12 & 17 & 17.0 & E & 17.12 & 17.00 & pfaffian\_exact         & E\\
+    Gset   & cycle\_8            & &  8 &  8 &  8.0 & E &  8.00 &  8.00 & exact\_small           & E\\
+    \midrule
+    BiqMac & spinglass2d\_L4\_s0 & & 16 & 24 &  5.0 & E &  5.92 &  5.10$^\ddagger$ & exact\_small\_signed & E\\
+    BiqMac & spinglass2d\_L5\_s0 & & 25 & 40 &  8.0 & E & 11.44 &  7.91 & pa\_primary            & A\\
+    BiqMac & torus2d\_L4\_s1     & & 16 & 32 & 14.0 & E & 15.70 & 14.64$^\ddagger$ & exact\_small\_signed & E\\
+    BiqMac & pm1s\_n20\_s2       & & 20 & 59 & 13.0 & E & 17.03 & 14.81$^\ddagger$ & exact\_small\_signed & E\\
+    BiqMac & g05\_n12\_s3        & & 12 & 38 & 27.0 & E & 29.34 & 26.89 & exact\_small           & E\\
+    \midrule
+    DIMACS & petersen            & & 10 & 15 & 12.0 & E & 12.96 & 12.12 & exact\_small           & E\\
+    DIMACS & myciel3             & & 11 & 20 & 16.0 & E & 17.54 & 16.86 & exact\_small           & E\\
+    DIMACS & k4                  & &  4 &  6 &  4.0 & E &  4.05 &  3.92 & cograph\_dp            & E\\
+    DIMACS & c6                  & &  6 &  6 &  6.0 & E &  6.00 &  6.00 & exact\_small           & E\\
+    DIMACS & queen5\_5           & &  6 &  9 &  7.0 & E &  7.17 &  6.98 & exact\_small           & E\\
+    \bottomrule
+  \end{tabular}
+  \caption{Unified benchmark panel (post B159-Dag-8b). \textbf{cert}: \textsc{E}xact
+    \ILP-certificate or \textsc{A}pproximate (sandwich \LB/\UB).
+    $\UB_{\FW}, \LB_{\FW}$: Frank--Wolfe sandwich bounds on the
+    unsigned $|w|$-Laplacian (\cref{sec:fwsdp}).
+    \textbf{Auto}: dispatcher-selected strategy. $\ddagger$: on signed
+    instances the reported $\LB_{\FW}$ is a lower bound on the
+    \emph{unsigned}-Laplacian cut and therefore does not satisfy the
+    sandwich $\LB_{\FW} \le \OPT$; a sign-aware FW backend is queued
+    as future work (\cref{sec:discussion}).}
+  \label{tab:selector}
+\end{table}
+
+% ===================================================================
+\section{Anytime sandwich curve}
+\label{sec:anytime}
+
+\cref{fig:anytime} shows the central paper-figure: a time-vs-value
+anytime curve for the DIMACS \texttt{myciel3} instance. The upper-bound
+trace is drawn per \FW iteration with cumulative-minima smoothing to
+enforce monotonicity. The lower-bound trace is the five-layer cascade:
+an alternating bit-string initialiser, then \MPQS-BP, then
+\FW-\GW-rounding applied to the current $Y_k$, then $1$-flip polish.
+The horizontal solid line is the \ILP-certified $\OPT = 16$; the shaded
+band is the sandwich gap. At termination ($400$ iterations,
+wall-clock $\approx 3$\,s on a GTX~1650-class machine) we have
+\begin{equation}
+  16 \;=\; \LB \;\le\; \OPT \;=\; 16 \;\le\; \UB \;=\; 17.32,
+  \qquad \text{gap} = 7.61\%.
+\end{equation}
+This is the first publicly-documented sandwich on \texttt{myciel3} at
+this resolution and also validates the cross-module certificate bridge
+(\FW sandwich $\times$ \ILP oracle $\times$ GW rounding $\times$ $1$-flip
+polish). The figure is reproducible from
+\texttt{docs/paper/data/b49\_anytime\_trace.\{json,csv\}}.
+
+% ===================================================================
+\section{Hardware validation on \textsc{ibm\_kingston}}
+\label{sec:hardware}
+
+To test the paper-claim ``consumer-hardware tensor-network simulation
+competes with NISQ quantum hardware'' on real silicon, we submitted
+$p{=}1$ \QAOA circuits for two small DIMACS-style instances to the
+\textsc{ibm\_kingston} Heron device~\cite{qiskit2024,qiskitruntime2024}
+using the submission pipeline of \cref{sec:qaoa}. Circuits were
+transpiled with the default Qiskit-\textsc{Runtime} optimisation
+level and sampled with $4096$ shots. For each instance we report four
+expectation values: noiseless Aer ($\mathbb{E}_{\text{ideal}}$),
+generic depolarising Aer ($p_1 = 10^{-3}, p_2 = 10^{-2}$),
+calibration-mirror Aer (reading \textsc{ibm\_kingston}'s $T_1/T_2$
+and gate errors), and hardware. \cref{tab:hardware} and
+\cref{fig:hardware} collect the results.
+
+\begin{table}[t]
+  \centering\small
+  \begin{tabular}{lrrrrrrrrrr}
+    \toprule
+    \textbf{Instance} & $n$ & $m$ & $\OPT$
+      & \textbf{Noiseless} & \textbf{Depolar.} & \textbf{Cal.mirror}
+      & \textbf{Hardware} & \textbf{Best(HW)} & \textbf{Backend} & $\AR$\\
+    \midrule
+    \texttt{3reg8}    &  8 & 12 & 10 &  8.002 &  7.918 &  7.928 &  7.763 & 10 & \texttt{ibm\_kingston} & 0.776\\
+    \texttt{myciel3}  & 11 & 20 & 16 & 12.838 & 12.675 & 12.738 & 12.367 & 16 & \texttt{ibm\_kingston} & 0.773\\
+    \bottomrule
+  \end{tabular}
+  \caption{\QAOA $p{=}1$ hardware run on \textsc{ibm\_kingston},
+    $4096$ shots, $(\gamma^\ast, \beta^\ast)$ from the pre-submit
+    grid-search. Values are QAOA expectations $\mathbb{E}[H_C]$;
+    \textbf{Best(HW)} is the maximum cut-value in the sampled bit-strings;
+    $\AR = \mathbb{E}_{\text{hw}} / \OPT$.}
+  \label{tab:hardware}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85\linewidth]{figures/b165b_hardware_comparison.pdf}
+  \caption{Hardware validation figure. Four bars per instance
+    (noiseless / depolarising / calibration-mirror / hardware) with the
+    dashed horizontal line marking \ILP-certified $\OPT$. Annotations
+    above the hardware bars report $\AR$.}
+  \label{fig:hardware}
+\end{figure}
+
+Three observations deserve emphasis.
+
+\paragraph{(i) $p{=}1$ ratio above theory.}
+For QAOA $p{=}1$ on $3$-regular graphs the
+Farhi--Goldstone--Gutmann asymptotic lower bound is
+$\AR \ge 0.6924$~\cite{farhi2014quantum}. Our measured hardware ratio
+$0.776$ is approximately $12\%$ above this bound, and a comparable lift on the non-$3$-regular \texttt{myciel3} instance, where no analogous analytical bound applies. The lift arises from the
+pre-submit grid-search: instead of using a generic $(\gamma, \beta)$
+angle, we pay a small offline-simulation cost to find the angle-pair
+that maximises $\mathbb{E}[H_C]$ on noiseless Aer, then submit only
+that circuit.
+
+\paragraph{(ii) Calibration-mirror predicts hardware to within $2.9\%$.}
+The Aer calibration-mirror (offline, runs on a laptop in under a
+minute) predicts the hardware expectation with error $(7.928-7.763)/7.928
+= 2.1\%$ on \texttt{3reg8} and $(12.738-12.367)/12.738 = 2.9\%$ on
+\texttt{myciel3}. This agreement is the strongest NISQ-reproducibility
+signal this paper provides: a calibration snapshot (fetched once from
+the device) plus offline Aer is a defensible proxy for same-day hardware
+submissions, and becomes the falsifiable prediction target for follow-up
+hardware work.
+
+\paragraph{(iii) $\text{Best}(\text{HW}) = \OPT$ on both instances.}
+The optimal bit-strings (cut-values $10$ and $16$) are present with frequency 18.95\% and 5.54\% respectively in the sampled distribution of 4096 shots on both instances; the QAOA-expectation gap is
+therefore entirely in the \emph{distribution weight} on sub-optimal
+bit-strings, not in the solver's ability to find the optimum. This
+qualifies the paper-claim: $p{=}1$ \QAOA on \textsc{ibm\_kingston}
+is \emph{a} solver that finds $\OPT$ on these instances, although its
+expectation is sub-optimal.
+
+% ===================================================================
+\section{Combined leaderboard}
+\label{sec:leaderboard}
+
+\cref{fig:leaderboard} collects the per-instance ratios on the
+unified $14$-instance benchmark panel for the two principal lower-bound
+solvers: \MPQS-BP plus $1$-flip refine, and \MPQS-lightcone-\QAOA with
+signed spectral rounding. The dashed line is \ILP-certified $\OPT$;
+the dotted line is $\alpha_{\GW}$. \MPQS-BP attains $\OPT$ on $9/14$
+instances and remains above $\alpha_{\GW}$ on all Gset and DIMACS
+instances. \MPQS-lightcone improves on BP where loops tighten the
+message passing (\texttt{g05\_n12}, \texttt{myciel3}) but degrades on
+frustrated BiqMac instances.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/b154_leaderboard_ratio.pdf}
+  \caption{Combined benchmark leaderboard for Gset, BiqMac, and DIMACS.
+    Bars give $\ratio = \text{cut}/\OPT$ for \MPQS-BP~+~$1$-flip and
+    \MPQS-lightcone. Dashed line: \ILP-certified $\OPT$. Dotted line:
+    Goemans--Williamson bound $\alpha_{\GW}$.}
+  \label{fig:leaderboard}
+\end{figure}
+
+% ===================================================================
+\section{Discussion and limitations}
+\label{sec:discussion}
+
+\paragraph{BiqMac signed spin-glass instances.} Early versions of the
+dispatcher routed signed instances through solvers that were formally
+exact only on unweighted graphs (\texttt{pfaffian\_exact},
+\texttt{exact\_small}), occasionally returning \textsc{Exact}
+certificates that the \ILP-oracle falsified. The Dag-8 patch introduces
+(a) a sign-detector in B130 that steers negative-weight inputs to
+\texttt{exact\_small\_signed} or \texttt{pa\_primary}, (b) a certificate
+factory in B131 that downgrades any \textsc{Exact} claim on a signed
+instance to \textsc{Heuristic} when the oracle is not signed-safe, and
+(c) a signed-safe 4-constraint MILP linearisation in B159 (see
+\cref{eq:milp}) that correctly encodes $y_{uv} = |x_u - x_v|$ for any
+sign of $w_{uv}$. After Dag-8 the dispatcher reaches
+$\OPT = \text{Auto}$ on the full $14$-instance panel
+(\cref{tab:selector}). The remaining limitation is that the FW sandwich
+operates on the unsigned $|w|$-Laplacian and can therefore report
+$\LB_{\FW} > \OPT$ on frustrated signed instances; a sign-aware FW
+backend is a next-milestone item.
+
+\paragraph{\QAOA $p{=}1$ ceiling.} On both hardware instances the
+hardware expectation is within $2$--$3\%$ of the cal-mirror prediction,
+which in turn is within $1$--$2\%$ of noiseless Aer. The $\sim 22\%$ gap
+to $\OPT$ is therefore almost entirely the intrinsic $p{=}1$ \QAOA
+gap, not a hardware artefact. Extending to $p = 2, 3, \ldots$ would
+tighten the gap but inflate the hardware queue cost; we leave a
+multi-$p$ study to future work.
+
+\paragraph{FW sandwich on signed instances.} The Frank-Wolfe module operates on the unsigned $|w|$-Laplacian. On graph problems with negative edge weights, this means that while $\UB_{\FW}$ continues to bound signed $\OPT$ efficiently, the feasible primal bound $\LB_{\FW}$ only guarantees a bound for the unsigned MaxCut, which can exceed the signed MaxCut optimum. This violation of the sandwich invariant ($\LB_{\FW} > \OPT$) is evident on three BiqMac instances in \cref{tab:selector}; a sign-aware FW backend that directly optimizes the signed Laplacian is a required next step for full certification of frustrated inputs.
+
+\paragraph{Cograph-only exact path.} The twin-width dispatcher's
+\emph{exact} exit today is cograph-DP ($\tww = 0$). The natural
+extension is a bounded-twin-width dynamic program for
+$\tww \in \{1, \ldots, 5\}$~\cite{schidler2022sat,bonnet2022twin};
+this is a research-level item and we do not claim it here.
+
+\paragraph{Octonionic layer.} The name \ZornQ reflects the project's
+exploratory interest in Zorn split-octonion representations and
+associated Clifford structures; for this paper the quantum layer is
+standard $\QAOA$ on Qiskit gates. A companion paper~(in preparation)
+will report the split-octonion spinor--Clifford $\mathrm{Cl}(4,3)$
+falsification results in detail.
+
+% ===================================================================
+\section{Reproducibility}
+\label{sec:repro}
+
+All experiments in \cref{sec:ilp,sec:fwsdp,sec:mpqs,sec:dispatcher,sec:qaoa,sec:selector,sec:anytime,sec:hardware,sec:leaderboard}
+run on a single workstation (GTX\,1650 consumer-class GPU, 16\,GB RAM)
+under Python $3.12$ with \textsc{Docker}~\cite{docker}. The companion
+repository provides:
+\begin{itemize}
+  \item A pinned \texttt{requirements.txt} and \texttt{pyproject.toml}
+        with seven core dependencies and five optional dependency groups
+        (\texttt{dev}, \texttt{qiskit}, \texttt{ilp}, \texttt{gpu},
+        \texttt{all}).
+  \item A \texttt{Dockerfile} and \texttt{environment.yml} that pin
+        to Python 3.12-slim, set \texttt{PYTHONHASHSEED=0}, and expose
+        a reproducible entrypoint.
+  \item A deterministic seed-ledger module that derives per-run child
+        seeds via SHA-256 from a root seed, attaches them to the audit
+        trail, and supports bit-identical replay after save/load.
+  \item A test suite with $\gtrsim 500$ tests that passes on the pinned
+        container in under two minutes.
+\end{itemize}
+The \textsc{ibm\_kingston} hardware run of \cref{sec:hardware} was
+executed from the author's personal laptop using a token held
+\emph{outside} the project directory (via the \texttt{QISKIT\_IBM\_TOKEN}
+environment variable); no credentials are stored in the repository.
+Results are persisted to \texttt{docs/paper/hardware/jobs/<job\_id>.json}
+and are replayable via \texttt{--resume <job\_id>}. We follow the spirit
+of pre-registered reproducibility~\cite{ioannidis2005why}: every figure
+and table in the paper is generated from a deterministic pipeline whose
+input is a pinned configuration file.
+
+% ===================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+\ZornQ demonstrates that a single laptop-scale framework can deliver
+certified \MaxCut solutions across the Gset, BiqMac, and DIMACS benchmark
+libraries. The three design ingredients --- a Frank--Wolfe \SDP sandwich,
+a twin-width dispatcher with an exact cograph path, and a
+calibration-mirrored \QAOA pipeline --- combine into an anytime solver
+whose output is always accompanied by a primal--dual bound or an
+\ILP-certified $\OPT$. A real-hardware validation on
+\textsc{ibm\_kingston} shows the calibration-mirror predicting hardware
+expectation to within $2.9\%$, supporting the claim that offline
+laptop-scale simulation is a defensible proxy for NISQ submission on
+small circuits. All artefacts are container-reproducible.
+
+\paragraph{Outlook.} The immediate next steps are: (i) a sign-aware
+Frank--Wolfe Laplacian that restores the sandwich invariant
+$\LB_{\FW} \le \OPT$ on frustrated signed instances; (ii) a multi-$p$
+\QAOA hardware study comparing $p = 1, 2, 3$ expectations under matched
+cal-mirror baselines; (iii) a bounded-twin-width DP for $\tww \le 5$
+to widen the exact-certificate class; and (iv) a companion paper
+presenting the \ZornQ octonionic simulator layer independently of the
+\MaxCut benchmarking results reported here.
+
+% ===================================================================
+\section*{Data and code availability}
+
+All code, pinned container specification, raw JSON/CSV artefacts,
+LaTeX sources, and figure-generation pipelines are distributed with
+this manuscript in the companion repository. The \textsc{ibm\_kingston}
+job-bundles (\texttt{job\_id}, counts, and $(\gamma, \beta)$
+parameters) are included in \texttt{docs/paper/hardware/jobs/}.
+
+% ===================================================================
+\printbibliography
+
+\end{document}

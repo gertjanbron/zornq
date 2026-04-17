@@ -1,0 +1,15 @@
+idx dataset name n m ilp_opt fw_ub fw_lb disp_strategy disp_level t_ilp t_fw t_disp
+0 Gset petersen 10 15 12.0000 12.6148 12.3764 exact_small EXACT 0.0289 0.0252 0.0136
+1 Gset cube 8 12 12.0000 12.0005 11.9994 exact_small EXACT 0.0093 0.0056 0.0000
+2 Gset grid_4x3 12 17 17.0000 17.1190 16.9990 pfaffian_exact EXACT 0.0060 0.0105 0.0020
+3 Gset cycle_8 8 8 8.0000 8.0001 7.9998 exact_small EXACT 0.0075 0.0071 0.0010
+4 BiqMac spinglass2d_L4_s0 16 24 5.0000 5.8375 5.3758 exact_small_signed EXACT 0.0221 0.0282 0.0354
+5 BiqMac spinglass2d_L5_s0 25 40 8.0000 10.3432 9.1026 pa_primary APPROXIMATE 0.0341 0.0477 0.3035
+6 BiqMac torus2d_L4_s1 16 32 14.0000 15.5010 14.9994 exact_small_signed EXACT 0.0711 0.0303 0.0407
+7 BiqMac pm1s_n20_s2 20 59 13.0000 16.4762 15.5594 exact_small_signed EXACT 0.1049 0.0346 1.0155
+8 BiqMac g05_n12_s3 12 38 27.0000 27.8480 27.4698 exact_small EXACT 0.1030 0.0268 0.0040
+9 DIMACS petersen 10 15 12.0000 12.6148 12.3764 exact_small EXACT 0.0129 0.0227 0.0025
+10 DIMACS myciel3 11 20 16.0000 17.3178 17.0750 exact_small EXACT 0.0267 0.0238 0.0025
+11 DIMACS k4 4 6 4.0000 4.0300 3.9663 cograph_dp EXACT 0.0080 0.0209 0.0005
+12 DIMACS c6 6 6 6.0000 6.0001 5.9995 exact_small EXACT 0.0066 0.0045 0.0000
+13 DIMACS queen5_5 6 9 7.0000 7.1169 7.0304 exact_small EXACT 0.0095 0.0231 0.0010

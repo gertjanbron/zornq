@@ -1,0 +1,1062 @@
+{
+  "meta": {
+    "timestamp": "2026-04-17 17:51:08",
+    "n_instances": 14,
+    "generator": "b186_solver_selector_benchmark.py"
+  },
+  "rows": [
+    {
+      "dataset": "Gset",
+      "name": "petersen",
+      "n": 10,
+      "m": 15,
+      "known_opt": 12.0,
+      "solvers": {
+        "ilp": {
+          "solver": "ilp",
+          "cut_value": 12.0,
+          "upper_bound": 12.0,
+          "lower_bound": 12.0,
+          "gap_pct": 0.0,
+          "level": "EXACT",
+          "wall_time": 0.028901338577270508,
+          "extra": {
+            "certified": true,
+            "status": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+            "cut_bits": "0100100110"
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "fw_sdp": {
+          "solver": "fw_sdp",
+          "cut_value": 12.376409735295148,
+          "upper_bound": 12.614789498505065,
+          "lower_bound": 12.376409735295148,
+          "gap_pct": 1.8896848277822336,
+          "level": "BOUNDED",
+          "wall_time": 0.025189876556396484,
+          "extra": {
+            "iterations": 400,
+            "converged": false,
+            "final_gap": 0.23861152935597296,
+            "gw_guaranteed": 11.08284946180661,
+            "penalty": 6.0
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "cograph_dp": {
+          "solver": "cograph_dp",
+          "cut_value": null,
+          "upper_bound": null,
+          "lower_bound": null,
+          "gap_pct": null,
+          "level": null,
+          "wall_time": 0.0,
+          "extra": {},
+          "skipped": true,
+          "skip_reason": "not a cograph (contains P_4)"
+        },
+        "dispatcher_auto": {
+          "solver": "dispatcher_auto",
+          "cut_value": 12.0,
+          "upper_bound": null,
+          "lower_bound": 12.0,
+          "gap_pct": null,
+          "level": "EXACT",
+          "wall_time": 0.013608217239379883,
+          "extra": {
+            "strategy": "exact_small",
+            "tier": "exact",
+            "solvers_used": [
+              "brute_force"
+            ],
+            "ratio_to_m": 0.8,
+            "is_exact": true
+          },
+          "skipped": false,
+          "skip_reason": ""
+        }
+      }
+    },
+    {
+      "dataset": "Gset",
+      "name": "cube",
+      "n": 8,
+      "m": 12,
+      "known_opt": 12.0,
+      "solvers": {
+        "ilp": {
+          "solver": "ilp",
+          "cut_value": 12.0,
+          "upper_bound": 12.0,
+          "lower_bound": 12.0,
+          "gap_pct": 0.0,
+          "level": "EXACT",
+          "wall_time": 0.00927114486694336,
+          "extra": {
+            "certified": true,
+            "status": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+            "cut_bits": "01101001"
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "fw_sdp": {
+          "solver": "fw_sdp",
+          "cut_value": 11.999405522093923,
+          "upper_bound": 12.000483080241482,
+          "lower_bound": 11.999405522093923,
+          "gap_pct": 0.008979289753201745,
+          "level": "NEAR_EXACT",
+          "wall_time": 0.005558967590332031,
+          "extra": {
+            "iterations": 75,
+            "converged": true,
+            "final_gap": 0.0011177581283590143,
+            "gw_guaranteed": 10.543144414976956,
+            "penalty": 6.0
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "cograph_dp": {
+          "solver": "cograph_dp",
+          "cut_value": null,
+          "upper_bound": null,
+          "lower_bound": null,
+          "gap_pct": null,
+          "level": null,
+          "wall_time": 0.0,
+          "extra": {},
+          "skipped": true,
+          "skip_reason": "not a cograph (contains P_4)"
+        },
+        "dispatcher_auto": {
+          "solver": "dispatcher_auto",
+          "cut_value": 12.0,
+          "upper_bound": null,
+          "lower_bound": 12.0,
+          "gap_pct": null,
+          "level": "EXACT",
+          "wall_time": 0.0,
+          "extra": {
+            "strategy": "exact_small",
+            "tier": "exact",
+            "solvers_used": [
+              "brute_force"
+            ],
+            "ratio_to_m": 1.0,
+            "is_exact": true
+          },
+          "skipped": false,
+          "skip_reason": ""
+        }
+      }
+    },
+    {
+      "dataset": "Gset",
+      "name": "grid_4x3",
+      "n": 12,
+      "m": 17,
+      "known_opt": 17.0,
+      "solvers": {
+        "ilp": {
+          "solver": "ilp",
+          "cut_value": 17.0,
+          "upper_bound": 17.0,
+          "lower_bound": 17.0,
+          "gap_pct": 0.0,
+          "level": "EXACT",
+          "wall_time": 0.0060272216796875,
+          "extra": {
+            "certified": true,
+            "status": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+            "cut_bits": "010101010101"
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "fw_sdp": {
+          "solver": "fw_sdp",
+          "cut_value": 16.999026138296486,
+          "upper_bound": 17.11904064912568,
+          "lower_bound": 16.999026138296486,
+          "gap_pct": 0.7010586240726226,
+          "level": "NEAR_EXACT",
+          "wall_time": 0.010546684265136719,
+          "extra": {
+            "iterations": 156,
+            "converged": true,
+            "final_gap": 0.001453036857512302,
+            "gw_guaranteed": 15.040104352695858,
+            "penalty": 5.666666666666667
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "cograph_dp": {
+          "solver": "cograph_dp",
+          "cut_value": null,
+          "upper_bound": null,
+          "lower_bound": null,
+          "gap_pct": null,
+          "level": null,
+          "wall_time": 0.0,
+          "extra": {},
+          "skipped": true,
+          "skip_reason": "not a cograph (contains P_4)"
+        },
+        "dispatcher_auto": {
+          "solver": "dispatcher_auto",
+          "cut_value": 17.0,
+          "upper_bound": null,
+          "lower_bound": 17.0,
+          "gap_pct": null,
+          "level": "EXACT",
+          "wall_time": 0.002013683319091797,
+          "extra": {
+            "strategy": "pfaffian_exact",
+            "tier": "exact",
+            "solvers_used": [
+              "pfaffian"
+            ],
+            "ratio_to_m": 1.0,
+            "is_exact": true
+          },
+          "skipped": false,
+          "skip_reason": ""
+        }
+      }
+    },
+    {
+      "dataset": "Gset",
+      "name": "cycle_8",
+      "n": 8,
+      "m": 8,
+      "known_opt": 8.0,
+      "solvers": {
+        "ilp": {
+          "solver": "ilp",
+          "cut_value": 8.0,
+          "upper_bound": 8.0,
+          "lower_bound": 8.0,
+          "gap_pct": 0.0,
+          "level": "EXACT",
+          "wall_time": 0.007527828216552734,
+          "extra": {
+            "certified": true,
+            "status": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+            "cut_bits": "01010101"
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "fw_sdp": {
+          "solver": "fw_sdp",
+          "cut_value": 7.999841002502598,
+          "upper_bound": 8.00010820137285,
+          "lower_bound": 7.999841002502598,
+          "gap_pct": 0.0033399407048768006,
+          "level": "NEAR_EXACT",
+          "wall_time": 0.007102489471435547,
+          "extra": {
+            "iterations": 119,
+            "converged": true,
+            "final_gap": 0.00027042502334140295,
+            "gw_guaranteed": 7.028575061398131,
+            "penalty": 4.0
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "cograph_dp": {
+          "solver": "cograph_dp",
+          "cut_value": null,
+          "upper_bound": null,
+          "lower_bound": null,
+          "gap_pct": null,
+          "level": null,
+          "wall_time": 0.0,
+          "extra": {},
+          "skipped": true,
+          "skip_reason": "not a cograph (contains P_4)"
+        },
+        "dispatcher_auto": {
+          "solver": "dispatcher_auto",
+          "cut_value": 8.0,
+          "upper_bound": null,
+          "lower_bound": 8.0,
+          "gap_pct": null,
+          "level": "EXACT",
+          "wall_time": 0.00099945068359375,
+          "extra": {
+            "strategy": "exact_small",
+            "tier": "exact",
+            "solvers_used": [
+              "brute_force"
+            ],
+            "ratio_to_m": 1.0,
+            "is_exact": true
+          },
+          "skipped": false,
+          "skip_reason": ""
+        }
+      }
+    },
+    {
+      "dataset": "BiqMac",
+      "name": "spinglass2d_L4_s0",
+      "n": 16,
+      "m": 24,
+      "known_opt": null,
+      "solvers": {
+        "ilp": {
+          "solver": "ilp",
+          "cut_value": 5.0,
+          "upper_bound": 5.0,
+          "lower_bound": 5.0,
+          "gap_pct": 0.0,
+          "level": "EXACT",
+          "wall_time": 0.022145509719848633,
+          "extra": {
+            "certified": true,
+            "status": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+            "cut_bits": "0000001101110011"
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "fw_sdp": {
+          "solver": "fw_sdp",
+          "cut_value": 5.375772716133619,
+          "upper_bound": 5.837519500939702,
+          "lower_bound": 5.375772716133619,
+          "gap_pct": 7.9099827372183125,
+          "level": "BOUNDED",
+          "wall_time": 0.028169631958007812,
+          "extra": {
+            "iterations": 400,
+            "converged": false,
+            "final_gap": 0.22298493034798916,
+            "gw_guaranteed": 5.1286111327455846,
+            "penalty": 4.75
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "cograph_dp": {
+          "solver": "cograph_dp",
+          "cut_value": null,
+          "upper_bound": null,
+          "lower_bound": null,
+          "gap_pct": null,
+          "level": null,
+          "wall_time": 0.0,
+          "extra": {},
+          "skipped": true,
+          "skip_reason": "not a cograph (contains P_4)"
+        },
+        "dispatcher_auto": {
+          "solver": "dispatcher_auto",
+          "cut_value": 5.0,
+          "upper_bound": null,
+          "lower_bound": 5.0,
+          "gap_pct": null,
+          "level": "EXACT",
+          "wall_time": 0.0354464054107666,
+          "extra": {
+            "strategy": "exact_small_signed",
+            "tier": "exact",
+            "solvers_used": [
+              "signed_brute_force"
+            ],
+            "ratio_to_m": 0,
+            "is_exact": true
+          },
+          "skipped": false,
+          "skip_reason": ""
+        }
+      }
+    },
+    {
+      "dataset": "BiqMac",
+      "name": "spinglass2d_L5_s0",
+      "n": 25,
+      "m": 40,
+      "known_opt": null,
+      "solvers": {
+        "ilp": {
+          "solver": "ilp",
+          "cut_value": 8.0,
+          "upper_bound": 8.0,
+          "lower_bound": 8.0,
+          "gap_pct": 0.0,
+          "level": "EXACT",
+          "wall_time": 0.03407907485961914,
+          "extra": {
+            "certified": true,
+            "status": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+            "cut_bits": "0000000010000000010101111"
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "fw_sdp": {
+          "solver": "fw_sdp",
+          "cut_value": 9.102632895425536,
+          "upper_bound": 10.34319607725806,
+          "lower_bound": 9.102632895425536,
+          "gap_pct": 11.994002362192406,
+          "level": "BOUNDED",
+          "wall_time": 0.04765963554382324,
+          "extra": {
+            "iterations": 400,
+            "converged": false,
+            "final_gap": 0.5881198491116315,
+            "gw_guaranteed": 9.087118345635842,
+            "penalty": 5.04
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "cograph_dp": {
+          "solver": "cograph_dp",
+          "cut_value": null,
+          "upper_bound": null,
+          "lower_bound": null,
+          "gap_pct": null,
+          "level": null,
+          "wall_time": 0.0,
+          "extra": {},
+          "skipped": true,
+          "skip_reason": "not a cograph (contains P_4)"
+        },
+        "dispatcher_auto": {
+          "solver": "dispatcher_auto",
+          "cut_value": 8.0,
+          "upper_bound": null,
+          "lower_bound": 8.0,
+          "gap_pct": null,
+          "level": "APPROXIMATE",
+          "wall_time": 0.30353879928588867,
+          "extra": {
+            "strategy": "pa_primary",
+            "tier": "classical",
+            "solvers_used": [
+              "pa",
+              "bls_polish"
+            ],
+            "ratio_to_m": 0,
+            "is_exact": false
+          },
+          "skipped": false,
+          "skip_reason": ""
+        }
+      }
+    },
+    {
+      "dataset": "BiqMac",
+      "name": "torus2d_L4_s1",
+      "n": 16,
+      "m": 32,
+      "known_opt": null,
+      "solvers": {
+        "ilp": {
+          "solver": "ilp",
+          "cut_value": 14.0,
+          "upper_bound": 14.0,
+          "lower_bound": 14.0,
+          "gap_pct": 0.0,
+          "level": "EXACT",
+          "wall_time": 0.07109427452087402,
+          "extra": {
+            "certified": true,
+            "status": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+            "cut_bits": "0001111100001100"
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "fw_sdp": {
+          "solver": "fw_sdp",
+          "cut_value": 14.999388581806397,
+          "upper_bound": 15.501002298793123,
+          "lower_bound": 14.999388581806397,
+          "gap_pct": 3.2360082742893432,
+          "level": "BOUNDED",
+          "wall_time": 0.030251264572143555,
+          "extra": {
+            "iterations": 400,
+            "converged": false,
+            "final_gap": 0.3103456562312825,
+            "gw_guaranteed": 13.618560579627687,
+            "penalty": 5.0
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "cograph_dp": {
+          "solver": "cograph_dp",
+          "cut_value": null,
+          "upper_bound": null,
+          "lower_bound": null,
+          "gap_pct": null,
+          "level": null,
+          "wall_time": 0.0,
+          "extra": {},
+          "skipped": true,
+          "skip_reason": "not a cograph (contains P_4)"
+        },
+        "dispatcher_auto": {
+          "solver": "dispatcher_auto",
+          "cut_value": 14.0,
+          "upper_bound": null,
+          "lower_bound": 14.0,
+          "gap_pct": null,
+          "level": "EXACT",
+          "wall_time": 0.04073143005371094,
+          "extra": {
+            "strategy": "exact_small_signed",
+            "tier": "exact",
+            "solvers_used": [
+              "signed_brute_force"
+            ],
+            "ratio_to_m": 1.75,
+            "is_exact": true
+          },
+          "skipped": false,
+          "skip_reason": ""
+        }
+      }
+    },
+    {
+      "dataset": "BiqMac",
+      "name": "pm1s_n20_s2",
+      "n": 20,
+      "m": 59,
+      "known_opt": null,
+      "solvers": {
+        "ilp": {
+          "solver": "ilp",
+          "cut_value": 13.0,
+          "upper_bound": 13.0,
+          "lower_bound": 13.0,
+          "gap_pct": 0.0,
+          "level": "EXACT",
+          "wall_time": 0.10487031936645508,
+          "extra": {
+            "certified": true,
+            "status": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+            "cut_bits": "00000111100000001000"
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "fw_sdp": {
+          "solver": "fw_sdp",
+          "cut_value": 15.55941456987606,
+          "upper_bound": 16.476240744265404,
+          "lower_bound": 15.55941456987606,
+          "gap_pct": 5.56453494835251,
+          "level": "BOUNDED",
+          "wall_time": 0.03458452224731445,
+          "extra": {
+            "iterations": 400,
+            "converged": false,
+            "final_gap": 0.30365097229479154,
+            "gw_guaranteed": 14.475366068281813,
+            "penalty": 7.8
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "cograph_dp": {
+          "solver": "cograph_dp",
+          "cut_value": null,
+          "upper_bound": null,
+          "lower_bound": null,
+          "gap_pct": null,
+          "level": null,
+          "wall_time": 0.0,
+          "extra": {},
+          "skipped": true,
+          "skip_reason": "not a cograph (contains P_4)"
+        },
+        "dispatcher_auto": {
+          "solver": "dispatcher_auto",
+          "cut_value": 13.0,
+          "upper_bound": null,
+          "lower_bound": 13.0,
+          "gap_pct": null,
+          "level": "EXACT",
+          "wall_time": 1.0155291557312012,
+          "extra": {
+            "strategy": "exact_small_signed",
+            "tier": "exact",
+            "solvers_used": [
+              "signed_brute_force"
+            ],
+            "ratio_to_m": 0,
+            "is_exact": true
+          },
+          "skipped": false,
+          "skip_reason": ""
+        }
+      }
+    },
+    {
+      "dataset": "BiqMac",
+      "name": "g05_n12_s3",
+      "n": 12,
+      "m": 38,
+      "known_opt": null,
+      "solvers": {
+        "ilp": {
+          "solver": "ilp",
+          "cut_value": 27.0,
+          "upper_bound": 27.0,
+          "lower_bound": 27.0,
+          "gap_pct": 0.0,
+          "level": "EXACT",
+          "wall_time": 0.10303187370300293,
+          "extra": {
+            "certified": true,
+            "status": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+            "cut_bits": "001100010111"
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "fw_sdp": {
+          "solver": "fw_sdp",
+          "cut_value": 27.469844819597267,
+          "upper_bound": 27.84800006337678,
+          "lower_bound": 27.469844819597267,
+          "gap_pct": 1.3579260374852904,
+          "level": "BOUNDED",
+          "wall_time": 0.026755094528198242,
+          "extra": {
+            "iterations": 400,
+            "converged": false,
+            "final_gap": 0.2534557473445034,
+            "gw_guaranteed": 24.466138935680306,
+            "penalty": 12.666666666666666
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "cograph_dp": {
+          "solver": "cograph_dp",
+          "cut_value": null,
+          "upper_bound": null,
+          "lower_bound": null,
+          "gap_pct": null,
+          "level": null,
+          "wall_time": 0.0,
+          "extra": {},
+          "skipped": true,
+          "skip_reason": "not a cograph (contains P_4)"
+        },
+        "dispatcher_auto": {
+          "solver": "dispatcher_auto",
+          "cut_value": 27.0,
+          "upper_bound": null,
+          "lower_bound": 27.0,
+          "gap_pct": null,
+          "level": "EXACT",
+          "wall_time": 0.004029273986816406,
+          "extra": {
+            "strategy": "exact_small",
+            "tier": "exact",
+            "solvers_used": [
+              "brute_force"
+            ],
+            "ratio_to_m": 0.7105263157894737,
+            "is_exact": true
+          },
+          "skipped": false,
+          "skip_reason": ""
+        }
+      }
+    },
+    {
+      "dataset": "DIMACS",
+      "name": "petersen",
+      "n": 10,
+      "m": 15,
+      "known_opt": null,
+      "solvers": {
+        "ilp": {
+          "solver": "ilp",
+          "cut_value": 12.0,
+          "upper_bound": 12.0,
+          "lower_bound": 12.0,
+          "gap_pct": 0.0,
+          "level": "EXACT",
+          "wall_time": 0.012929201126098633,
+          "extra": {
+            "certified": true,
+            "status": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+            "cut_bits": "0010111000"
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "fw_sdp": {
+          "solver": "fw_sdp",
+          "cut_value": 12.376409735295148,
+          "upper_bound": 12.614789498505065,
+          "lower_bound": 12.376409735295148,
+          "gap_pct": 1.8896848277822336,
+          "level": "BOUNDED",
+          "wall_time": 0.022675752639770508,
+          "extra": {
+            "iterations": 400,
+            "converged": false,
+            "final_gap": 0.23861152935597296,
+            "gw_guaranteed": 11.08284946180661,
+            "penalty": 6.0
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "cograph_dp": {
+          "solver": "cograph_dp",
+          "cut_value": null,
+          "upper_bound": null,
+          "lower_bound": null,
+          "gap_pct": null,
+          "level": null,
+          "wall_time": 0.0,
+          "extra": {},
+          "skipped": true,
+          "skip_reason": "not a cograph (contains P_4)"
+        },
+        "dispatcher_auto": {
+          "solver": "dispatcher_auto",
+          "cut_value": 12.0,
+          "upper_bound": null,
+          "lower_bound": 12.0,
+          "gap_pct": null,
+          "level": "EXACT",
+          "wall_time": 0.0025177001953125,
+          "extra": {
+            "strategy": "exact_small",
+            "tier": "exact",
+            "solvers_used": [
+              "brute_force"
+            ],
+            "ratio_to_m": 0.8,
+            "is_exact": true
+          },
+          "skipped": false,
+          "skip_reason": ""
+        }
+      }
+    },
+    {
+      "dataset": "DIMACS",
+      "name": "myciel3",
+      "n": 11,
+      "m": 20,
+      "known_opt": null,
+      "solvers": {
+        "ilp": {
+          "solver": "ilp",
+          "cut_value": 15.999999999999998,
+          "upper_bound": 15.999999999999998,
+          "lower_bound": 15.999999999999998,
+          "gap_pct": 0.0,
+          "level": "EXACT",
+          "wall_time": 0.026659250259399414,
+          "extra": {
+            "certified": true,
+            "status": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+            "cut_bits": "01010011110"
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "fw_sdp": {
+          "solver": "fw_sdp",
+          "cut_value": 17.07499489942665,
+          "upper_bound": 17.317787752947076,
+          "lower_bound": 17.07499489942665,
+          "gap_pct": 1.4019853862633798,
+          "level": "BOUNDED",
+          "wall_time": 0.023783206939697266,
+          "extra": {
+            "iterations": 400,
+            "converged": false,
+            "final_gap": 0.1943071821656268,
+            "gw_guaranteed": 15.214715608229184,
+            "penalty": 7.2727272727272725
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "cograph_dp": {
+          "solver": "cograph_dp",
+          "cut_value": null,
+          "upper_bound": null,
+          "lower_bound": null,
+          "gap_pct": null,
+          "level": null,
+          "wall_time": 0.0,
+          "extra": {},
+          "skipped": true,
+          "skip_reason": "not a cograph (contains P_4)"
+        },
+        "dispatcher_auto": {
+          "solver": "dispatcher_auto",
+          "cut_value": 16.0,
+          "upper_bound": null,
+          "lower_bound": 16.0,
+          "gap_pct": null,
+          "level": "EXACT",
+          "wall_time": 0.0025076866149902344,
+          "extra": {
+            "strategy": "exact_small",
+            "tier": "exact",
+            "solvers_used": [
+              "brute_force"
+            ],
+            "ratio_to_m": 0.8,
+            "is_exact": true
+          },
+          "skipped": false,
+          "skip_reason": ""
+        }
+      }
+    },
+    {
+      "dataset": "DIMACS",
+      "name": "k4",
+      "n": 4,
+      "m": 6,
+      "known_opt": null,
+      "solvers": {
+        "ilp": {
+          "solver": "ilp",
+          "cut_value": 4.0,
+          "upper_bound": 4.0,
+          "lower_bound": 4.0,
+          "gap_pct": 0.0,
+          "level": "EXACT",
+          "wall_time": 0.008031845092773438,
+          "extra": {
+            "certified": true,
+            "status": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+            "cut_bits": "0011"
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "fw_sdp": {
+          "solver": "fw_sdp",
+          "cut_value": 3.9663145041893584,
+          "upper_bound": 4.030028269505545,
+          "lower_bound": 3.9663145041893584,
+          "gap_pct": 1.5809756422379526,
+          "level": "BOUNDED",
+          "wall_time": 0.020852088928222656,
+          "extra": {
+            "iterations": 400,
+            "converged": false,
+            "final_gap": 0.0637491634617251,
+            "gw_guaranteed": 3.5406216364567915,
+            "penalty": 6.0
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "cograph_dp": {
+          "solver": "cograph_dp",
+          "cut_value": 4.0,
+          "upper_bound": 4.0,
+          "lower_bound": 4.0,
+          "gap_pct": 0.0,
+          "level": "EXACT",
+          "wall_time": 0.0,
+          "extra": {
+            "method": "cotree_dp_O(n^3)"
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "dispatcher_auto": {
+          "solver": "dispatcher_auto",
+          "cut_value": 4.0,
+          "upper_bound": null,
+          "lower_bound": 4.0,
+          "gap_pct": null,
+          "level": "EXACT",
+          "wall_time": 0.0005114078521728516,
+          "extra": {
+            "strategy": "cograph_dp",
+            "tier": "exact",
+            "solvers_used": [
+              "cograph_dp"
+            ],
+            "ratio_to_m": 0.6666666666666666,
+            "is_exact": true
+          },
+          "skipped": false,
+          "skip_reason": ""
+        }
+      }
+    },
+    {
+      "dataset": "DIMACS",
+      "name": "c6",
+      "n": 6,
+      "m": 6,
+      "known_opt": null,
+      "solvers": {
+        "ilp": {
+          "solver": "ilp",
+          "cut_value": 6.0,
+          "upper_bound": 6.0,
+          "lower_bound": 6.0,
+          "gap_pct": 0.0,
+          "level": "EXACT",
+          "wall_time": 0.006645917892456055,
+          "extra": {
+            "certified": true,
+            "status": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+            "cut_bits": "010101"
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "fw_sdp": {
+          "solver": "fw_sdp",
+          "cut_value": 5.99953647262926,
+          "upper_bound": 6.000115070437164,
+          "lower_bound": 5.99953647262926,
+          "gap_pct": 0.009643111858876986,
+          "level": "NEAR_EXACT",
+          "wall_time": 0.0045282840728759766,
+          "extra": {
+            "iterations": 72,
+            "converged": true,
+            "final_gap": 0.0005823525618007253,
+            "gw_guaranteed": 5.271461096283274,
+            "penalty": 4.0
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "cograph_dp": {
+          "solver": "cograph_dp",
+          "cut_value": null,
+          "upper_bound": null,
+          "lower_bound": null,
+          "gap_pct": null,
+          "level": null,
+          "wall_time": 0.0,
+          "extra": {},
+          "skipped": true,
+          "skip_reason": "not a cograph (contains P_4)"
+        },
+        "dispatcher_auto": {
+          "solver": "dispatcher_auto",
+          "cut_value": 6.0,
+          "upper_bound": null,
+          "lower_bound": 6.0,
+          "gap_pct": null,
+          "level": "EXACT",
+          "wall_time": 0.0,
+          "extra": {
+            "strategy": "exact_small",
+            "tier": "exact",
+            "solvers_used": [
+              "brute_force"
+            ],
+            "ratio_to_m": 1.0,
+            "is_exact": true
+          },
+          "skipped": false,
+          "skip_reason": ""
+        }
+      }
+    },
+    {
+      "dataset": "DIMACS",
+      "name": "queen5_5",
+      "n": 6,
+      "m": 9,
+      "known_opt": null,
+      "solvers": {
+        "ilp": {
+          "solver": "ilp",
+          "cut_value": 7.0,
+          "upper_bound": 7.0,
+          "lower_bound": 7.0,
+          "gap_pct": 0.0,
+          "level": "EXACT",
+          "wall_time": 0.00952911376953125,
+          "extra": {
+            "certified": true,
+            "status": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+            "cut_bits": "011001"
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "fw_sdp": {
+          "solver": "fw_sdp",
+          "cut_value": 7.030352423959458,
+          "upper_bound": 7.116873714569322,
+          "lower_bound": 7.030352423959458,
+          "gap_pct": 1.2157204705310611,
+          "level": "BOUNDED",
+          "wall_time": 0.0230560302734375,
+          "extra": {
+            "iterations": 400,
+            "converged": false,
+            "final_gap": 0.05562690892022015,
+            "gw_guaranteed": 6.252600570672024,
+            "penalty": 6.0
+          },
+          "skipped": false,
+          "skip_reason": ""
+        },
+        "cograph_dp": {
+          "solver": "cograph_dp",
+          "cut_value": null,
+          "upper_bound": null,
+          "lower_bound": null,
+          "gap_pct": null,
+          "level": null,
+          "wall_time": 0.0,
+          "extra": {},
+          "skipped": true,
+          "skip_reason": "not a cograph (contains P_4)"
+        },
+        "dispatcher_auto": {
+          "solver": "dispatcher_auto",
+          "cut_value": 7.0,
+          "upper_bound": null,
+          "lower_bound": 7.0,
+          "gap_pct": null,
+          "level": "EXACT",
+          "wall_time": 0.0010056495666503906,
+          "extra": {
+            "strategy": "exact_small",
+            "tier": "exact",
+            "solvers_used": [
+              "brute_force"
+            ],
+            "ratio_to_m": 0.7777777777777778,
+            "is_exact": true
+          },
+          "skipped": false,
+          "skip_reason": ""
+        }
+      }
+    }
+  ]
+}
