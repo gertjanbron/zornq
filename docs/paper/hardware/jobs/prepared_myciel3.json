@@ -1,0 +1,22 @@
+{
+  "instance": "myciel3",
+  "n_qubits": 11,
+  "p": 1,
+  "gammas": [
+    0.05
+  ],
+  "betas": [
+    1.1530972450961723
+  ],
+  "expected_exp_value_aer": 11.001953125,
+  "shots": 4096,
+  "backend_name": "",
+  "job_id": "",
+  "status": "PREPARED",
+  "submit_unix": 0.0,
+  "done_unix": 0.0,
+  "queue_wait_s": 0.0,
+  "execute_s": 0.0,
+  "counts": {},
+  "note": "dry-run pre-search (5x5 grid)"
+}

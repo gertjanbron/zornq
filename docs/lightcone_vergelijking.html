@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>ZornQ — Lightcone: Kolom vs BFS Diamond</title>
+<style>
+  body { font-family: 'Segoe UI', sans-serif; background: #0a0a1a; color: #e0e0e0; margin: 0; padding: 20px; }
+  h1 { text-align: center; color: #7eb8ff; font-size: 1.5em; }
+  .container { display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; margin-top: 20px; }
+  .panel { text-align: center; }
+  .panel h2 { font-size: 1.1em; margin-bottom: 8px; }
+  .panel .stats { font-size: 0.85em; color: #aaa; margin-top: 8px; line-height: 1.6; }
+  .panel .stats .highlight { color: #ff9; font-weight: bold; }
+  canvas { border: 1px solid #333; border-radius: 6px; }
+  .legend { display: flex; justify-content: center; gap: 30px; margin-top: 24px; font-size: 0.85em; }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .legend .box { width: 14px; height: 14px; border-radius: 2px; display: inline-block; }
+  .controls { text-align: center; margin: 20px 0; }
+  .controls label { margin: 0 10px; color: #aaa; }
+  .controls select, .controls input { background: #1a1a2e; color: #e0e0e0; border: 1px solid #444; padding: 4px 8px; border-radius: 4px; }
+  .verdict { max-width: 700px; margin: 30px auto; padding: 16px; background: #111; border-left: 3px solid #ff9; border-radius: 4px; line-height: 1.6; font-size: 0.9em; }
+  .verdict h3 { color: #ff9; margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>Lightcone Vergelijking: Kolom-blok vs BFS Diamond</h1>
+
+<div class="controls">
+  <label>Grid: <select id="selGrid">
+    <option value="10,5">10x5</option>
+    <option value="10,3">10x3</option>
+    <option value="12,4">12x4</option>
+    <option value="8,6">8x6</option>
+    <option value="20,3" selected>20x3</option>
+  </select></label>
+  <label>p = <select id="selP">
+    <option value="1">1</option>
+    <option value="2" selected>2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+  </select></label>
+  <label>Edge positie: <select id="selEdge">
+    <option value="center" selected>Midden</option>
+    <option value="left">Links</option>
+    <option value="right">Rechts</option>
+  </select></label>
+</div>
+
+<div class="container">
+  <div class="panel">
+    <h2 style="color:#5599ff">Methode 1: Kolom-blok (huidige code)</h2>
+    <canvas id="cvBlock" width="500" height="300"></canvas>
+    <div class="stats" id="statsBlock"></div>
+  </div>
+  <div class="panel">
+    <h2 style="color:#ffcc44">Methode 2: BFS Diamond (echte lichtkegel)</h2>
+    <canvas id="cvBFS" width="500" height="300"></canvas>
+    <div class="stats" id="statsBFS"></div>
+  </div>
+</div>
+
+<div class="legend">
+  <span><span class="box" style="background:#222"></span> Buiten lichtkegel</span>
+  <span><span class="box" style="background:#5599ff"></span> Kolom-blok cone</span>
+  <span><span class="box" style="background:#ffcc44"></span> BFS diamond cone</span>
+  <span><span class="box" style="background:#ff4444"></span> Target edge</span>
+  <span><span class="box" style="background:#333"></span> Grid node</span>
+</div>
+
+<div class="verdict" id="verdict"></div>
+
+<script>
+function getParams() {
+  const [Lx, Ly] = document.getElementById('selGrid').value.split(',').map(Number);
+  const p = Number(document.getElementById('selP').value);
+  const edgePos = document.getElementById('selEdge').value;
+  let ex;
+  if (edgePos === 'center') ex = Math.floor(Lx / 2) - 1;
+  else if (edgePos === 'left') ex = 1;
+  else ex = Lx - 3;
+  return { Lx, Ly, p, ex, ey: Math.floor(Ly / 2) };
+}
+
+// Column-based lightcone (huidige code)
+function getColumnCone(Lx, Ly, p, ex) {
+  const colMin = Math.max(0, ex - p);
+  const colMax = Math.min(Lx - 1, ex + 1 + p);
+  const qubits = new Set();
+  for (let x = colMin; x <= colMax; x++) {
+    for (let y = 0; y < Ly; y++) {
+      qubits.add(x + ',' + y);
+    }
+  }
+  return qubits;
+}
+
+// BFS lightcone (echte causale kegel)
+function getBFSCone(Lx, Ly, p, ex, ey) {
+  // Start van de twee edge-endpoints
+  const starts = [[ex, ey], [ex + 1, ey]];
+  const visited = new Set();
+  let frontier = new Set();
+
+  for (const [sx, sy] of starts) {
+    frontier.add(sx + ',' + sy);
+    visited.add(sx + ',' + sy);
+  }
+
+  for (let step = 0; step < p; step++) {
+    const nextFrontier = new Set();
+    for (const key of frontier) {
+      const [x, y] = key.split(',').map(Number);
+      // Buren op het grid
+      const neighbors = [
+        [x - 1, y], [x + 1, y],  // horizontaal
+        [x, y - 1], [x, y + 1],  // verticaal
+      ];
+      for (const [nx, ny] of neighbors) {
+        if (nx >= 0 && nx < Lx && ny >= 0 && ny < Ly) {
+          const nk = nx + ',' + ny;
+          if (!visited.has(nk)) {
+            visited.add(nk);
+            nextFrontier.add(nk);
+          }
+        }
+      }
+    }
+    // Voeg huidige frontier + next toe voor volgende stap
+    frontier = nextFrontier;
+  }
+  return visited;
+}
+
+function drawGrid(canvas, Lx, Ly, p, ex, ey, coneSet, color) {
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0a0a1a';
+  ctx.fillRect(0, 0, W, H);
+
+  const pad = 20;
+  const cellW = Math.min((W - 2 * pad) / Lx, (H - 2 * pad) / Ly, 40);
+  const cellH = cellW;
+  const offX = (W - Lx * cellW) / 2;
+  const offY = (H - Ly * cellH) / 2;
+
+  // Teken edges
+  ctx.strokeStyle = '#222';
+  ctx.lineWidth = 0.5;
+  for (let x = 0; x < Lx; x++) {
+    for (let y = 0; y < Ly; y++) {
+      const cx = offX + x * cellW + cellW / 2;
+      const cy = offY + y * cellH + cellH / 2;
+      if (x + 1 < Lx) {
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + cellW, cy);
+        ctx.stroke();
+      }
+      if (y + 1 < Ly) {
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx, cy + cellH);
+        ctx.stroke();
+      }
+    }
+  }
+
+  // Teken nodes
+  for (let x = 0; x < Lx; x++) {
+    for (let y = 0; y < Ly; y++) {
+      const cx = offX + x * cellW + cellW / 2;
+      const cy = offY + y * cellH + cellH / 2;
+      const key = x + ',' + y;
+      const inCone = coneSet.has(key);
+      const isEdge = (x === ex && y === ey) || (x === ex + 1 && y === ey);
+
+      const r = Math.max(cellW * 0.3, 4);
+
+      if (isEdge) {
+        ctx.fillStyle = '#ff4444';
+        ctx.shadowColor = '#ff4444';
+        ctx.shadowBlur = 8;
+      } else if (inCone) {
+        ctx.fillStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 4;
+      } else {
+        ctx.fillStyle = '#333';
+        ctx.shadowBlur = 0;
+      }
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  // Teken target edge dik
+  const e1x = offX + ex * cellW + cellW / 2;
+  const e2x = offX + (ex + 1) * cellW + cellW / 2;
+  const ecy = offY + ey * cellH + cellH / 2;
+  ctx.strokeStyle = '#ff4444';
+  ctx.lineWidth = 3;
+  ctx.shadowColor = '#ff4444';
+  ctx.shadowBlur = 6;
+  ctx.beginPath();
+  ctx.moveTo(e1x, ecy);
+  ctx.lineTo(e2x, ecy);
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+}
+
+function update() {
+  const { Lx, Ly, p, ex, ey } = getParams();
+
+  const blockCone = getColumnCone(Lx, Ly, p, ex);
+  const bfsCone = getBFSCone(Lx, Ly, p, ex, ey);
+
+  const cvBlock = document.getElementById('cvBlock');
+  const cvBFS = document.getElementById('cvBFS');
+
+  // Resize canvassen
+  const maxW = 560;
+  const cellSize = Math.min(Math.floor(maxW / Lx), 40, Math.floor(300 / Ly));
+  const cw = Lx * cellSize + 40;
+  const ch = Ly * cellSize + 40;
+  cvBlock.width = cvBFS.width = cw;
+  cvBlock.height = cvBFS.height = ch;
+
+  drawGrid(cvBlock, Lx, Ly, p, ex, ey, blockCone, '#5599ff');
+  drawGrid(cvBFS, Lx, Ly, p, ex, ey, bfsCone, '#ffcc44');
+
+  // Stats
+  const nBlock = blockCone.size;
+  const nBFS = bfsCone.size;
+  const savings = nBlock - nBFS;
+  const pctSaved = nBlock > 0 ? ((savings / nBlock) * 100).toFixed(1) : 0;
+  const svBlock = Math.pow(2, nBlock);
+  const svBFS = Math.pow(2, nBFS);
+  const speedup = nBlock > nBFS ? Math.pow(2, savings) : 1;
+
+  document.getElementById('statsBlock').innerHTML =
+    `Qubits in cone: <span class="highlight">${nBlock}</span><br>` +
+    `State vector: 2<sup>${nBlock}</sup> = ${svBlock.toLocaleString()} amplitudes<br>` +
+    `VRAM: ~${(svBlock * 16 / 1e6).toFixed(1)} MB (fp64)`;
+
+  document.getElementById('statsBFS').innerHTML =
+    `Qubits in cone: <span class="highlight">${nBFS}</span><br>` +
+    `State vector: 2<sup>${nBFS}</sup> = ${svBFS.toLocaleString()} amplitudes<br>` +
+    `VRAM: ~${(svBFS * 16 / 1e6).toFixed(1)} MB (fp64)`;
+
+  // Verdict
+  let verdictHTML;
+  if (savings <= 0) {
+    verdictHTML = `<h3>Conclusie: Geen verschil</h3>
+      Bij Ly=${Ly}, p=${p} zijn beide methoden identiek. Alle rijen zijn bereikbaar
+      binnen ${p} stappen, dus de kolom-blok benadering IS al de exacte lichtkegel.
+      <b>BFS-trimming levert hier 0 qubits winst op.</b>`;
+  } else if (savings <= 2) {
+    verdictHTML = `<h3>Conclusie: Marginaal verschil (${savings} qubits, ${pctSaved}%)</h3>
+      BFS spaart ${savings} qubit(s) uit, goed voor ${speedup}x minder amplitudes.
+      Bij Ly=${Ly} is de winst verwaarloosbaar. De implementatie-complexiteit
+      (irreguliere qubit-indexing, ZZ-gate herbouw) weegt niet op tegen de besparing.`;
+  } else {
+    verdictHTML = `<h3>Conclusie: Significante besparing (${savings} qubits, ${pctSaved}%)</h3>
+      BFS-cone heeft ${nBFS} qubits vs ${nBlock} in kolom-blok.
+      Dat is <b>${speedup.toLocaleString()}x minder amplitudes</b> en evenredig minder VRAM.
+      Bij Ly=${Ly} met p=${p} wordt BFS-trimming relevant.
+      Dit vereist B54 (Arbitraire-Graaf Ordering) voor de implementatie.`;
+  }
+  document.getElementById('verdict').innerHTML = verdictHTML;
+}
+
+document.getElementById('selGrid').addEventListener('change', update);
+document.getElementById('selP').addEventListener('change', update);
+document.getElementById('selEdge').addEventListener('change', update);
+update();
+</script>
+</body>
+</html>

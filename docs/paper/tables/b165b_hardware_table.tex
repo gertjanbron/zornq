@@ -1,0 +1,14 @@
+\begin{table}[t]
+\centering
+\small
+\caption{B165b --- QAOA $p=1$ op IBM Quantum hardware vergeleken met drie Aer-baselines. $E[H_C]$ is de MaxCut-expectation uit de sample-distributie; OPT is ILP-certified via B159.}
+\label{tab:b165b-hardware}
+\begin{tabular}{l r r r r r r r r l r}
+\toprule
+Instance & $n$ & $m$ & OPT & Noiseless & Depolar.\ & Cal.\ mirror & Hardware & Best(HW) & Backend & AR \\
+\midrule
+3reg8 & 8 & 12 & 10 & 8.002 & 7.918 & 7.928 & 7.763 & 10 & ibm_kingston & 0.776 \\
+myciel3 & 11 & 20 & 16 & 12.838 & 12.675 & 12.738 & 12.367 & 16 & ibm_kingston & 0.773 \\
+\bottomrule
+\end{tabular}
+\end{table}

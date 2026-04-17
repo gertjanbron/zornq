@@ -1,0 +1,32 @@
+{
+  "metadata": {
+    "mode": "test",
+    "solvers": [
+      "demo"
+    ],
+    "seed": 42,
+    "time_limit": 1.0,
+    "n_instances": 1
+  },
+  "timestamp": "2026-04-15T12:00:00",
+  "gpu_available": false,
+  "results": [
+    {
+      "instance": "K3",
+      "graph_id": "b66c4c45b16b020c",
+      "n_nodes": 3,
+      "n_edges": 3,
+      "bks": 2,
+      "solver": "demo",
+      "seed": 42,
+      "time_limit_s": 1.0,
+      "cut": 1.0,
+      "time_s": 0.1,
+      "gap": 0.0,
+      "gap_pct": 0.0,
+      "ratio": 1.0,
+      "device": "cpu",
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "run_id": "d54f085a7304",
+  "timestamp": "2026-04-12T10:58:45.034297+00:00",
+  "graph": "grid_4x3",
+  "p": 1,
+  "seed": null,
+  "method": "lightcone",
+  "config": {
+    "Lx": 4,
+    "Ly": 3,
+    "chi": null,
+    "fp32": false
+  },
+  "environment": {
+    "hostname": "claude",
+    "os": "Linux-6.8.0-106-generic-x86_64-with-glibc2.35",
+    "cpu": "x86_64",
+    "ram_mb": 3915,
+    "gpu": {
+      "name": "none",
+      "vram_mb": 0,
+      "driver": "unknown"
+    },
+    "python": "3.10.12",
+    "packages": {
+      "python": "3.10.12",
+      "numpy": "2.2.6",
+      "scipy": "1.15.3"
+    },
+    "git": {
+      "commit": "unknown",
+      "branch": "unknown",
+      "dirty": false
+    },
+    "audit_trail_version": "1.0.0"
+  },
+  "phases": [
+    {
+      "name": "progressive_p1",
+      "wall_time": 0.5368311405181885,
+      "ratio": 0.6943961181047198,
+      "time_s": 0.49727296829223633,
+      "n_evals": 118,
+      "gammas": [
+        0.3137574659438571
+      ],
+      "betas": [
+        1.1780971265791949
+      ]
+    }
+  ],
+  "result": {
+    "ratio": 0.6943961181047198,
+    "gammas": [
+      0.3137574659438571
+    ],
+    "betas": [
+      1.1780971265791949
+    ],
+    "cut_value": 11.804734007780237,
+    "n_edges": 17,
+    "total_time_s": 0.5368363857269287
+  },
+  "bounds": {
+    "upper": 17,
+    "bks": 17
+  },
+  "diagnostics": {
+    "max_lightcone_qubits": 12,
+    "n_edges": 17,
+    "Lx": 4,
+    "Ly": 3
+  },
+  "warnings": [],
+  "total_time_s": 0.536846399307251
+}

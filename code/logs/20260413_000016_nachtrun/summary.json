@@ -1,0 +1,114 @@
+{
+  "timestamp": "20260413_171607",
+  "total_time_s": 62151.2821893692,
+  "results": {
+    "b36": [
+      {
+        "label": "b36_3reg_n20",
+        "status": "OK",
+        "time_s": 3962.9206314086914,
+        "output": "C:\\Users\\Me\\Documents\\Onderzoeksprojecten\\103. ZornQ - Octonionische Quantum Computing\\code\\logs\\20260413_000016_nachtrun\\nachtrun_b36_3reg_n20.out"
+      },
+      {
+        "label": "b36_3reg_n22",
+        "status": "TIMEOUT",
+        "time_s": 7199.931028366089
+      },
+      {
+        "label": "b36_er_n20_p01",
+        "status": "OK",
+        "time_s": 2852.926712989807,
+        "output": "C:\\Users\\Me\\Documents\\Onderzoeksprojecten\\103. ZornQ - Octonionische Quantum Computing\\code\\logs\\20260413_000016_nachtrun\\nachtrun_b36_er_n20_p01.out"
+      },
+      {
+        "label": "b36_er_n20_p02",
+        "status": "OK",
+        "time_s": 3632.462240934372,
+        "output": "C:\\Users\\Me\\Documents\\Onderzoeksprojecten\\103. ZornQ - Octonionische Quantum Computing\\code\\logs\\20260413_000016_nachtrun\\nachtrun_b36_er_n20_p02.out"
+      },
+      {
+        "label": "b36_er_n22_p015",
+        "status": "TIMEOUT",
+        "time_s": 7200.049049139023
+      }
+    ],
+    "b40": [
+      {
+        "label": "b40_Ly4_p2_chi32_cyl",
+        "status": "FAIL(rc=1)",
+        "time_s": 1251.2277550697327,
+        "output": "C:\\Users\\Me\\Documents\\Onderzoeksprojecten\\103. ZornQ - Octonionische Quantum Computing\\code\\logs\\20260413_000016_nachtrun\\nachtrun_b40_Ly4_p2_chi32_cyl.out"
+      },
+      {
+        "label": "b40_Ly4_p2_chi64_cyl",
+        "status": "TIMEOUT",
+        "time_s": 7199.973647117615
+      },
+      {
+        "label": "b40_Ly4_p3_chi32_cyl_prog",
+        "status": "OK",
+        "time_s": 7095.689734458923,
+        "output": "C:\\Users\\Me\\Documents\\Onderzoeksprojecten\\103. ZornQ - Octonionische Quantum Computing\\code\\logs\\20260413_000016_nachtrun\\nachtrun_b40_Ly4_p3_chi32_cyl_prog.out"
+      },
+      {
+        "label": "b40_Ly4_p3_chi64_cyl_prog",
+        "status": "TIMEOUT",
+        "time_s": 7199.977472305298
+      },
+      {
+        "label": "b40_Ly4_p2_chi64_strip",
+        "status": "TIMEOUT",
+        "time_s": 7199.993449449539
+      },
+      {
+        "label": "b40_Ly4_p3_chi64_strip_prog",
+        "status": "TIMEOUT",
+        "time_s": 7199.990537405014
+      }
+    ],
+    "b47": [
+      {
+        "label": "b47_8x4_p2",
+        "status": "FAIL(rc=1)",
+        "time_s": 28.943952083587646,
+        "output": "C:\\Users\\Me\\Documents\\Onderzoeksprojecten\\103. ZornQ - Octonionische Quantum Computing\\code\\logs\\20260413_000016_nachtrun\\nachtrun_b47_8x4_p2.out"
+      },
+      {
+        "label": "b47_16x4_p2",
+        "status": "FAIL(rc=1)",
+        "time_s": 29.11852741241455,
+        "output": "C:\\Users\\Me\\Documents\\Onderzoeksprojecten\\103. ZornQ - Octonionische Quantum Computing\\code\\logs\\20260413_000016_nachtrun\\nachtrun_b47_16x4_p2.out"
+      },
+      {
+        "label": "b47_32x4_p2",
+        "status": "FAIL(rc=1)",
+        "time_s": 32.4233283996582,
+        "output": "C:\\Users\\Me\\Documents\\Onderzoeksprojecten\\103. ZornQ - Octonionische Quantum Computing\\code\\logs\\20260413_000016_nachtrun\\nachtrun_b47_32x4_p2.out"
+      },
+      {
+        "label": "b47_50x4_p2",
+        "status": "FAIL(rc=1)",
+        "time_s": 31.99885892868042,
+        "output": "C:\\Users\\Me\\Documents\\Onderzoeksprojecten\\103. ZornQ - Octonionische Quantum Computing\\code\\logs\\20260413_000016_nachtrun\\nachtrun_b47_50x4_p2.out"
+      },
+      {
+        "label": "b47_100x4_p2_chi32",
+        "status": "FAIL(rc=1)",
+        "time_s": 30.995048999786377,
+        "output": "C:\\Users\\Me\\Documents\\Onderzoeksprojecten\\103. ZornQ - Octonionische Quantum Computing\\code\\logs\\20260413_000016_nachtrun\\nachtrun_b47_100x4_p2_chi32.out"
+      },
+      {
+        "label": "b47_16x4_p1_ref",
+        "status": "FAIL(rc=1)",
+        "time_s": 1.2448341846466064,
+        "output": "C:\\Users\\Me\\Documents\\Onderzoeksprojecten\\103. ZornQ - Octonionische Quantum Computing\\code\\logs\\20260413_000016_nachtrun\\nachtrun_b47_16x4_p1_ref.out"
+      },
+      {
+        "label": "b47_32x4_p1_ref",
+        "status": "FAIL(rc=1)",
+        "time_s": 1.3550782203674316,
+        "output": "C:\\Users\\Me\\Documents\\Onderzoeksprojecten\\103. ZornQ - Octonionische Quantum Computing\\code\\logs\\20260413_000016_nachtrun\\nachtrun_b47_32x4_p1_ref.out"
+      }
+    ]
+  }
+}

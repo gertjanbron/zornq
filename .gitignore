@@ -1,0 +1,76 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Pytest / mypy / ruff cache
+.pytest_cache/
+pytest-cache-files-*/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# LaTeX build
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+docs/paper/main.log
+docs/paper/main.aux
+docs/paper/main.bbl
+docs/paper/main.bcf
+docs/paper/main.blg
+docs/paper/main.out
+docs/paper/main.run.xml
+docs/paper/main_sandbox_preview.pdf
+
+# Runtime / results
+.runtime/
+runtime_cuda/
+scratch_plain_test/
+scratch_temp_test/
+results/
+*.npz
+
+# Backups
+*.bak
+*.bak-*
+*.bak-truncated
+*~
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+
+# Sensitive — never commit tokens
+*token*
+*secret*
+*credential*
+*.pem
+*.key
+.env
+.env.*
+
+# Cowork / Claude session paths (defensive)
+transcripts/
+.claude/
+local-agent-mode-sessions/

@@ -1,0 +1,102 @@
+{
+  "timestamp": "20260412_215850",
+  "total_time_s": 0.1982121467590332,
+  "results": {
+    "b36": [
+      {
+        "label": "b36_3reg_n20",
+        "status": "dry_run",
+        "time_s": 0
+      },
+      {
+        "label": "b36_3reg_n22",
+        "status": "dry_run",
+        "time_s": 0
+      },
+      {
+        "label": "b36_er_n20_p01",
+        "status": "dry_run",
+        "time_s": 0
+      },
+      {
+        "label": "b36_er_n20_p02",
+        "status": "dry_run",
+        "time_s": 0
+      },
+      {
+        "label": "b36_er_n22_p015",
+        "status": "dry_run",
+        "time_s": 0
+      }
+    ],
+    "b40": [
+      {
+        "label": "b40_Ly4_p2_chi32_cyl",
+        "status": "dry_run",
+        "time_s": 0
+      },
+      {
+        "label": "b40_Ly4_p2_chi64_cyl",
+        "status": "dry_run",
+        "time_s": 0
+      },
+      {
+        "label": "b40_Ly4_p3_chi32_cyl_prog",
+        "status": "dry_run",
+        "time_s": 0
+      },
+      {
+        "label": "b40_Ly4_p3_chi64_cyl_prog",
+        "status": "dry_run",
+        "time_s": 0
+      },
+      {
+        "label": "b40_Ly4_p2_chi64_strip",
+        "status": "dry_run",
+        "time_s": 0
+      },
+      {
+        "label": "b40_Ly4_p3_chi64_strip_prog",
+        "status": "dry_run",
+        "time_s": 0
+      }
+    ],
+    "b47": [
+      {
+        "label": "b47_8x4_p2",
+        "status": "dry_run",
+        "time_s": 0
+      },
+      {
+        "label": "b47_16x4_p2",
+        "status": "dry_run",
+        "time_s": 0
+      },
+      {
+        "label": "b47_32x4_p2",
+        "status": "dry_run",
+        "time_s": 0
+      },
+      {
+        "label": "b47_50x4_p2",
+        "status": "dry_run",
+        "time_s": 0
+      },
+      {
+        "label": "b47_100x4_p2_chi32",
+        "status": "dry_run",
+        "time_s": 0
+      },
+      {
+        "label": "b47_16x4_p1_ref",
+        "status": "dry_run",
+        "time_s": 0
+      },
+      {
+        "label": "b47_32x4_p1_ref",
+        "status": "dry_run",
+        "time_s": 0
+      }
+    ]
+  }
+}

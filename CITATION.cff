@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "ZornQ Research Code (paper-1 companion)"
+authors:
+  - family-names: Bron
+    given-names: Gertjan
+    orcid: "https://orcid.org/FILL-IN"
+version: 1.0.0
+date-released: 2026-04-17
+license: MIT
+doi: "10.5281/zenodo.FILL-IN-AFTER-MINT"
+url: "https://github.com/FILL-IN/zornq"
+repository-code: "https://github.com/FILL-IN/zornq"
+preferred-citation:
+  type: software
+  title: "ZornQ: Anytime MaxCut with Sandwich Certificates and Real-Hardware QAOA Validation"
+  authors:
+    - family-names: Bron
+      given-names: Gertjan
+  year: 2026
+  doi: "10.5281/zenodo.FILL-IN-AFTER-MINT"

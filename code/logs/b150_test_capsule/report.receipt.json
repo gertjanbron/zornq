@@ -1,0 +1,10 @@
+{
+  "kind": "zornq_benchmark_receipt",
+  "capsule_version": "1.0.0",
+  "created_at": "2026-04-15T08:40:31.041482+00:00",
+  "capsule_path": "C:\\Users\\Me\\Documents\\Onderzoeksprojecten\\103. ZornQ - Octonionische Quantum Computing\\code\\logs\\b150_test_capsule\\report.capsule.json",
+  "evidence_level": "benchmark_certificate",
+  "payload_sha256": "94e15ef99f36ad573daf0e4327e3fc05cbbd6940bd56e24276857070b72d9208",
+  "claims_sha256": "c8e539291c292f4537f4174edbe119c18788531a5f31e3b8f39b0f7eb75835df",
+  "source_report_sha256": "2fa62da2dd9f3c8c620652c656a6bc598fde8e42a9f846e36b30b57ed43e604b"
+}

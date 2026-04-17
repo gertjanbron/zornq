@@ -1,0 +1,108 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zornq"
+version = "0.1.0"
+description = "ZornQ — Octonionic Quantum Computing: scalable MaxCut / QAOA / SDP / tensor network engine"
+readme = "README.md"
+license = { text = "Proprietary — research use" }
+requires-python = ">=3.10"
+authors = [
+    { name = "Gertjan Bron", email = "gertjanbron@gmail.com" },
+]
+keywords = [
+    "quantum-computing",
+    "maxcut",
+    "qaoa",
+    "sdp",
+    "frank-wolfe",
+    "tensor-networks",
+    "octonions",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+# Core dependencies - matched to requirements.txt (single source of truth)
+dependencies = [
+    "numpy>=2.0,<3.0",
+    "scipy>=1.11,<2.0",
+    "cvxpy>=1.5,<2.0",
+    "networkx>=3.0,<4.0",
+    "matplotlib>=3.8,<4.0",
+    "pandas>=2.0,<3.0",
+    "psutil>=5.9",
+]
+
+[project.optional-dependencies]
+# pytest + coverage
+dev = [
+    "pytest>=8.0,<10.0",
+    "pytest-cov>=4.1",
+]
+
+# Quantum hardware pad (B165)
+qiskit = [
+    "qiskit>=1.0,<3.0",
+    "qiskit-aer>=0.14",
+    "qiskit-ibm-runtime>=0.20",
+]
+
+# Alternatieve ILP-backends (B159)
+ilp = [
+    "pyscipopt>=5.0",
+    # gurobipy vereist licentie, bewust niet gepinned
+]
+
+# GPU pad (B11b/B65/B136) - kies zelf cuda11x of cuda12x
+gpu = [
+    "cupy-cuda12x>=13.0",
+]
+
+# Alles-tegelijk voor volledige reproduceerbaarheid
+all = [
+    "pytest>=8.0,<10.0",
+    "pytest-cov>=4.1",
+    "qiskit>=1.0,<3.0",
+    "qiskit-aer>=0.14",
+    "qiskit-ibm-runtime>=0.20",
+]
+
+[project.urls]
+Repository = "https://github.com/gertjanbron/zornq"
+# (geüpdatet bij open source-release onder B179/B181)
+
+# Entry-points voor handige CLI-toegang
+[project.scripts]
+zornq-gset-bench = "code.gset_benchmark:main"
+zornq-b176 = "code.b176_benchmark:main"
+zornq-b159 = "code.b159_benchmark:main"
+zornq-audit-show = "code.audit_trail:main"
+
+[tool.setuptools]
+packages = ["code"]
+
+# --- Pytest configuratie ---
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["code"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning:cvxpy.*",
+    "ignore::PendingDeprecationWarning",
+]

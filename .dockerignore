@@ -1,0 +1,62 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Runtime output (blijft via volume-mount persistent)
+results/
+code/logs/
+code/results/
+*.log
+
+# Secrets / credentials (NOOIT in image)
+.env
+.env.*
+*.pem
+*.key
+*secret*
+*token*
+qiskit_token.txt
+
+# Lock-files van andere package managers (we gebruiken pip/requirements.txt)
+package-lock.json
+yarn.lock
+Pipfile.lock
+
+# Docs / paper-bestanden (niet nodig in runtime-image)
+docs/paper/*.pdf
+docs/paper/*.aux
+docs/paper/*.bbl
+docs/paper/*.blg
+docs/paper/*.log
+docs/paper/*.out
+
+# Grote data-bestanden blijven buiten image
+*.npz
+*.npy
+*.h5
+*.hdf5

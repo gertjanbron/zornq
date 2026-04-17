@@ -1,0 +1,66 @@
+{
+  "metadata": {
+    "mode": "test",
+    "solvers": [
+      "bls"
+    ],
+    "seed": 42,
+    "time_limit": 2.0,
+    "n_instances": 1,
+    "routebook": {
+      "regimes": {
+        "exact_small": {
+          "rows": 1,
+          "instances": 1,
+          "avg_gap_pct": 0.0,
+          "worst_gap_pct": 0.0,
+          "worst_instance": "K5"
+        }
+      },
+      "first_tool_counts": {
+        "exact_reference": 1
+      }
+    },
+    "adversarial_slices": [
+      {
+        "instance": "K5",
+        "solver": "bls",
+        "gap_pct": 0.0,
+        "route_regime": "exact_small",
+        "route_first_tool": "exact_reference",
+        "n_nodes": 5,
+        "n_edges": 10
+      }
+    ]
+  },
+  "timestamp": "2026-04-15T13:30:55",
+  "gpu_available": true,
+  "results": [
+    {
+      "instance": "K5",
+      "graph_id": "c6182ecdac30e029",
+      "n_nodes": 5,
+      "n_edges": 10,
+      "bks": 6,
+      "solver": "bls",
+      "seed": 42,
+      "time_limit_s": 2.0,
+      "cut": 6.0,
+      "time_s": 0.007021427154541016,
+      "gap": 0.0,
+      "gap_pct": 0.0,
+      "ratio": 1.0,
+      "device": "cpu",
+      "error": null,
+      "route_regime": "exact_small",
+      "route_first_tool": "exact_reference",
+      "route_reason": "tiny instance where exact reference is still cheap",
+      "route_width_proxy": 4,
+      "route_density": 1.0,
+      "route_avg_degree": 4.0,
+      "route_max_degree": 4,
+      "route_cycle_rank": 6,
+      "route_is_grid": false
+    }
+  ]
+}

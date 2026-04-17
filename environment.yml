@@ -1,0 +1,55 @@
+# ZornQ conda/mamba environment - alternatief voor requirements.txt-pad.
+#
+# Gebruik:
+#   conda env create -f environment.yml
+#   conda activate zornq
+#   pytest code -q
+#
+# Of met mamba (aanbevolen voor snelheid):
+#   mamba env create -f environment.yml
+#
+# Voor update na wijziging:
+#   conda env update -f environment.yml --prune
+#
+# Na install: genereer deterministische lock via
+#   conda list --explicit > environment.lock.txt
+# om bit-exact reproduceerbaar te zijn op dezelfde platform.
+
+name: zornq
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  # --- Python ---
+  - python>=3.10,<3.13
+
+  # --- Core wetenschappelijk ---
+  - numpy>=2.0,<3.0
+  - scipy>=1.11,<2.0
+
+  # --- SDP / optimalisatie ---
+  # cvxpy via conda-forge is handig omdat het ook SCS + ECOS meepakt
+  - cvxpy>=1.5,<2.0
+
+  # --- Graaf & plotting ---
+  - networkx>=3.0,<4.0
+  - matplotlib-base>=3.8,<4.0
+
+  # --- Data & I/O ---
+  - pandas>=2.0,<3.0
+  - psutil>=5.9
+
+  # --- Testing ---
+  - pytest>=8.0,<10.0
+  - pytest-cov>=4.1
+
+  # --- Optional extras via pip omdat conda-forge-versies soms achter lopen ---
+  - pip
+  - pip:
+      # Uncomment voor Qiskit-pad (B165):
+      # - qiskit>=1.0,<3.0
+      # - qiskit-aer>=0.14
+      # - qiskit-ibm-runtime>=0.20
+      # Uncomment voor SCIP-pad (B159 alternatief):
+      # - pyscipopt>=5.0

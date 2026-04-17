@@ -1,0 +1,77 @@
+{
+  "kind": "zornq_benchmark_capsule",
+  "capsule_version": "1.0.0",
+  "created_at": "2026-04-15T08:40:31.041482+00:00",
+  "benchmark": {
+    "mode": "test",
+    "solvers": [
+      "demo"
+    ],
+    "seed": 42,
+    "time_limit": 1.0,
+    "n_instances": 1
+  },
+  "environment": {
+    "hostname": "B660",
+    "os": "Windows-11-10.0.26200-SP0",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "ram_mb": 81733,
+    "gpu": {
+      "name": "NVIDIA GeForce GTX 1650",
+      "vram_mb": 4096,
+      "driver": "591.86"
+    },
+    "python": "3.12.9",
+    "packages": {
+      "python": "3.12.9",
+      "numpy": "2.4.4",
+      "scipy": "1.17.1",
+      "cupy": "14.0.1"
+    },
+    "git": {
+      "commit": "unknown",
+      "branch": "unknown",
+      "dirty": false
+    },
+    "audit_trail_version": "1.0.0"
+  },
+  "evidence_level": "benchmark_certificate",
+  "claims": {
+    "n_rows": 1,
+    "n_errors": 0,
+    "per_solver": {
+      "demo": {
+        "n_rows": 1,
+        "n_errors": 0,
+        "avg_gap_pct": 0.0,
+        "avg_ratio": 1.0,
+        "within_1pct": 1,
+        "best_cut": 2.0
+      }
+    },
+    "per_instance": {
+      "K3": {
+        "n_rows": 1,
+        "best_solver": "demo",
+        "best_cut": 2.0,
+        "bks": 2,
+        "graph_id": "b66c4c45b16b020c"
+      }
+    }
+  },
+  "trusted_checks": {
+    "source_report_present": true,
+    "results_have_graph_ids": true,
+    "results_have_seed": true,
+    "results_have_time_limit": true
+  },
+  "source_report": {
+    "path": "C:\\Users\\Me\\Documents\\Onderzoeksprojecten\\103. ZornQ - Octonionische Quantum Computing\\code\\logs\\b150_test_capsule\\report.json",
+    "sha256": "2fa62da2dd9f3c8c620652c656a6bc598fde8e42a9f846e36b30b57ed43e604b"
+  },
+  "receipt": {
+    "payload_sha256": "94e15ef99f36ad573daf0e4327e3fc05cbbd6940bd56e24276857070b72d9208",
+    "claims_sha256": "c8e539291c292f4537f4174edbe119c18788531a5f31e3b8f39b0f7eb75835df",
+    "source_report_sha256": "2fa62da2dd9f3c8c620652c656a6bc598fde8e42a9f846e36b30b57ed43e604b"
+  }
+}

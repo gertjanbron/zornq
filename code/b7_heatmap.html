@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>B7: TEBD Informatieverlies Heatmap</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0a12; color: #e0e0e0; font-family: 'Segoe UI', system-ui, sans-serif; padding: 24px; }
+h1 { font-size: 22px; font-weight: 600; margin-bottom: 4px; color: #fff; }
+.subtitle { color: #888; font-size: 14px; margin-bottom: 24px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1200px; margin: 0 auto; }
+.panel { background: #13131f; border: 1px solid #2a2a3a; border-radius: 8px; padding: 16px; }
+.panel-title { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+.panel-desc { font-size: 12px; color: #777; margin-bottom: 12px; }
+canvas { width: 100%; border-radius: 4px; cursor: crosshair; }
+.full-width { grid-column: 1 / -1; }
+.legend { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 11px; color: #999; }
+.legend-bar { height: 10px; width: 120px; border-radius: 3px; }
+.tooltip { position: fixed; background: #1a1a2e; border: 1px solid #444; border-radius: 6px; padding: 8px 12px; font-size: 12px; pointer-events: none; display: none; z-index: 100; }
+.tooltip .val { color: #fff; font-weight: 600; }
+.stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; max-width: 1200px; margin: 0 auto 20px; }
+.stat { background: #13131f; border: 1px solid #2a2a3a; border-radius: 8px; padding: 12px 16px; text-align: center; }
+.stat .num { font-size: 24px; font-weight: 700; color: #fff; }
+.stat .label { font-size: 11px; color: #777; margin-top: 2px; }
+.kick-marker { color: #ff6b6b; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>B7: Informatieverlies in 3D Tijdsevolutie</h1>
+<p class="subtitle">TEBD op 2x2x8 Heisenberg (32 qubits), chi=32, dt=0.02 &mdash; spin-flip quench op laag 4</p>
+
+<div class="stats" id="stats"></div>
+<div class="grid" id="grid"></div>
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const DATA = {"Lx": 2, "Ly": 2, "Lz": 8, "nq": 32, "chi": 32, "dt": 0.02, "kick_site": 4, "n_bonds": 7, "n_sites": 8, "times": [0.0, 0.02, 0.04, 0.06, 0.08, 0.1, 0.12, 0.18, 0.24, 0.3, 0.36, 0.42, 0.48, 0.54, 0.6, 0.66], "trunc_error": [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 3.33e-29, 0.0, 3.55e-29, 0.0, 2.14e-07, 0.0], [0.0, 3.14e-14, 4.18e-14, 9.32e-07, 5.13e-05, 4.32e-04, 0.0], [0.0, 2.16e-11, 2.28e-10, 4.12e-06, 2.33e-04, 4.83e-04, 0.0], [0.0, 4.60e-11, 5.33e-08, 1.73e-05, 6.63e-04, 5.03e-04, 0.0], [0.0, 2.34e-10, 2.32e-07, 4.57e-05, 1.01e-03, 1.04e-04, 0.0], [0.0, 8.99e-10, 5.44e-07, 9.68e-05, 1.29e-03, 5.26e-05, 0.0], [0.0, 1.53e-08, 2.30e-06, 3.80e-04, 3.43e-03, 6.74e-05, 0.0], [0.0, 2.69e-07, 5.16e-06, 8.99e-04, 6.55e-03, 9.21e-05, 0.0], [0.0, 1.15e-06, 1.32e-05, 1.64e-03, 9.04e-03, 1.03e-04, 0.0], [0.0, 4.19e-06, 3.92e-05, 2.50e-03, 9.25e-03, 1.51e-04, 0.0], [0.0, 1.60e-05, 1.13e-04, 3.47e-03, 8.88e-03, 2.34e-04, 0.0], [0.0, 5.99e-05, 2.95e-04, 4.28e-03, 9.45e-03, 3.73e-04, 0.0], [0.0, 1.57e-04, 5.63e-04, 5.08e-03, 1.04e-02, 5.33e-04, 0.0], [0.0, 2.40e-04, 8.34e-04, 6.08e-03, 1.10e-02, 7.16e-04, 0.0], [0.0, 3.33e-04, 1.19e-03, 7.15e-03, 1.12e-02, 9.13e-04, 0.0]], "entropy": [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.026, 0.0, 0.026, 0.048, 0.026, 0.0], [0.827, 0.897, 0.827, 1.474, 1.608, 1.983, 0.0], [0.897, 1.391, 1.394, 1.500, 1.697, 2.729, 0.0], [1.390, 1.508, 1.398, 1.509, 2.224, 2.778, 0.0], [1.432, 1.514, 1.409, 1.562, 2.474, 2.775, 0.0], [1.436, 1.521, 1.423, 1.618, 2.630, 2.774, 0.0], [1.449, 1.544, 1.477, 1.793, 2.722, 2.773, 0.002], [1.466, 1.497, 1.548, 1.963, 2.759, 2.773, 0.010], [1.484, 1.519, 1.629, 2.100, 2.712, 2.774, 0.027], [1.503, 1.570, 1.719, 2.205, 2.681, 2.777, 0.061], [1.532, 1.635, 1.817, 2.304, 2.702, 2.783, 0.114], [1.570, 1.711, 1.920, 2.399, 2.749, 2.791, 0.189], [1.618, 1.791, 2.025, 2.482, 2.805, 2.797, 0.283], [1.658, 1.866, 2.131, 2.555, 2.862, 2.808, 0.394], [1.693, 1.944, 2.234, 2.623, 2.920, 2.817, 0.516]], "frac_lost": [[0,0,0,0,0,0,0],[0,0,0,0,0,1.34e-08,0],[0,0,0,2.91e-08,1.60e-06,2.70e-05,0],[0,0,0,1.29e-07,7.30e-06,3.02e-05,0],[0,0,1.67e-09,5.41e-07,2.07e-05,3.14e-05,0],[0,0,7.25e-09,1.43e-06,3.14e-05,6.49e-06,0],[0,0,1.70e-08,3.03e-06,4.03e-05,3.29e-06,0],[0,4.77e-10,7.19e-08,1.19e-05,1.07e-04,4.21e-06,0],[0,8.40e-09,1.61e-07,2.81e-05,2.05e-04,5.75e-06,0],[0,3.59e-08,4.13e-07,5.13e-05,2.82e-04,6.41e-06,0],[0,1.31e-07,1.23e-06,7.81e-05,2.89e-04,9.40e-06,0],[0,4.99e-07,3.54e-06,1.08e-04,2.77e-04,1.46e-05,0],[0,1.87e-06,9.21e-06,1.34e-04,2.95e-04,2.33e-05,0],[0,4.91e-06,1.76e-05,1.59e-04,3.24e-04,3.32e-05,0],[0,7.49e-06,2.61e-05,1.90e-04,3.43e-04,4.46e-05,0],[0,1.04e-05,3.71e-05,2.24e-04,3.49e-04,5.69e-05,0]], "sz": [[2.0, 2.0, 2.0, 2.0, -2.0, 2.0, 2.0, 2.0], [2.0, 2.0, 2.0, 1.994, -1.987, 1.994, 2.0, 2.0], [2.0, 2.0, 2.0, 1.975, -1.950, 1.975, 2.0, 2.0], [2.0, 2.0, 2.0, 1.945, -1.889, 1.945, 2.0, 2.0], [2.0, 2.0, 2.0, 1.905, -1.808, 1.905, 1.999, 2.0], [2.0, 2.0, 1.999, 1.858, -1.712, 1.857, 1.998, 2.0], [2.0, 2.0, 1.998, 1.806, -1.603, 1.804, 1.996, 2.0], [2.0, 2.0, 1.989, 1.638, -1.245, 1.634, 1.984, 2.0], [2.0, 1.999, 1.969, 1.487, -0.897, 1.482, 1.961, 1.999], [2.0, 1.996, 1.936, 1.370, -0.591, 1.366, 1.926, 1.997], [2.0, 1.991, 1.893, 1.282, -0.322, 1.280, 1.885, 1.991], [1.999, 1.981, 1.842, 1.214, -0.074, 1.215, 1.839, 1.982], [1.997, 1.966, 1.789, 1.167, 0.155, 1.162, 1.794, 1.967], [1.994, 1.947, 1.738, 1.143, 0.356, 1.122, 1.752, 1.946], [1.989, 1.924, 1.692, 1.141, 0.522, 1.097, 1.715, 1.919], [1.980, 1.898, 1.655, 1.156, 0.654, 1.087, 1.684, 1.884]], "bond_labels": ["0-1", "1-2", "2-3", "3-4", "4-5", "5-6", "6-7"], "site_labels": ["L0", "L1", "L2", "L3", "L4", "L5", "L6", "L7"]};
+
+const nT = DATA.times.length;
+const nB = DATA.n_bonds;
+const nS = DATA.n_sites;
+
+// Stats
+const maxTrunc = Math.max(...DATA.trunc_error.flat());
+const maxEntropy = Math.max(...DATA.entropy.flat());
+const totalLost = DATA.trunc_error.reduce((s,row) => s + row.reduce((a,b)=>a+b,0), 0);
+const finalSzKick = DATA.sz[nT-1][DATA.kick_site];
+
+document.getElementById('stats').innerHTML = `
+  <div class="stat"><div class="num">${DATA.nq}</div><div class="label">qubits (2x2x8)</div></div>
+  <div class="stat"><div class="num">${DATA.chi}</div><div class="label">bonddimensie (chi)</div></div>
+  <div class="stat"><div class="num">${maxTrunc.toExponential(1)}</div><div class="label">piek truncatie-fout</div></div>
+  <div class="stat"><div class="num">${finalSzKick > 0 ? '+' : ''}${finalSzKick.toFixed(2)}</div><div class="label">Sz kick-laag (was -2.00)</div></div>
+`;
+
+function createHeatmap(id, title, desc, data, labels, colorFn, valFmt, isLog) {
+  const rows = labels.length;
+  const cols = nT;
+  const panel = document.createElement('div');
+  panel.className = 'panel' + (rows > 7 ? '' : '');
+  panel.innerHTML = `<div class="panel-title">${title}</div><div class="panel-desc">${desc}</div>`;
+
+  const canvas = document.createElement('canvas');
+  const cellW = 36, cellH = 32;
+  const padL = 44, padR = 10, padT = 24, padB = 36;
+  canvas.width = padL + cols * cellW + padR;
+  canvas.height = padT + rows * cellH + padB;
+  canvas.style.maxWidth = '100%';
+  canvas.style.height = 'auto';
+
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#0d0d18';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Find data range
+  let vmin = Infinity, vmax = -Infinity;
+  for (let r = 0; r < rows; r++)
+    for (let c = 0; c < cols; c++) {
+      const v = data[c][r];
+      if (v > vmax) vmax = v;
+      if (v < vmin) vmin = v;
+    }
+  if (isLog) { vmin = 1e-8; }
+
+  // Draw cells
+  for (let c = 0; c < cols; c++) {
+    for (let r = 0; r < rows; r++) {
+      const v = data[c][r];
+      ctx.fillStyle = colorFn(v, vmin, vmax, isLog);
+      ctx.fillRect(padL + c * cellW, padT + r * cellH, cellW - 1, cellH - 1);
+    }
+  }
+
+  // Labels
+  ctx.fillStyle = '#888';
+  ctx.font = '10px system-ui';
+  ctx.textAlign = 'right';
+  for (let r = 0; r < rows; r++) {
+    const lbl = labels[r];
+    const isKick = lbl.includes(String(DATA.kick_site));
+    ctx.fillStyle = isKick ? '#ff6b6b' : '#888';
+    ctx.fillText(lbl, padL - 4, padT + r * cellH + cellH/2 + 3);
+  }
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#888';
+  for (let c = 0; c < cols; c += Math.max(1, Math.floor(cols/8))) {
+    ctx.fillText(DATA.times[c].toFixed(2), padL + c * cellW + cellW/2, padT + rows * cellH + 14);
+  }
+  ctx.fillText('t', padL + cols*cellW/2, padT + rows*cellH + 28);
+
+  panel.appendChild(canvas);
+
+  // Tooltip
+  canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const mx = (e.clientX - rect.left) * scaleX;
+    const my = (e.clientY - rect.top) * scaleY;
+    const c = Math.floor((mx - padL) / cellW);
+    const r = Math.floor((my - padT) / cellH);
+    const tip = document.getElementById('tooltip');
+    if (c >= 0 && c < cols && r >= 0 && r < rows) {
+      const v = data[c][r];
+      tip.innerHTML = `<strong>${labels[r]}</strong> @ t=${DATA.times[c].toFixed(2)}<br><span class="val">${valFmt(v)}</span>`;
+      tip.style.display = 'block';
+      tip.style.left = (e.clientX + 12) + 'px';
+      tip.style.top = (e.clientY - 30) + 'px';
+    } else {
+      tip.style.display = 'none';
+    }
+  });
+  canvas.addEventListener('mouseleave', () => {
+    document.getElementById('tooltip').style.display = 'none';
+  });
+
+  return panel;
+}
+
+// Color functions
+function truncColor(v, vmin, vmax, isLog) {
+  if (v <= 1e-12) return '#0d0d18';
+  const t = isLog ? Math.log10(Math.max(v, 1e-8)) / Math.log10(Math.max(vmax, 1e-4)) : v / vmax;
+  const tc = Math.max(0, Math.min(1, isLog ? (t + 1) : t));
+  // Black -> Orange -> Yellow -> White
+  if (tc < 0.33) { const s = tc / 0.33; return `rgb(${Math.round(s*200)},${Math.round(s*60)},0)`; }
+  if (tc < 0.66) { const s = (tc-0.33)/0.33; return `rgb(${200+Math.round(s*55)},${60+Math.round(s*160)},0)`; }
+  const s = (tc-0.66)/0.34; return `rgb(255,${220+Math.round(s*35)},${Math.round(s*200)})`;
+}
+
+function entropyColor(v, vmin, vmax) {
+  if (v <= 0.001) return '#0d0d18';
+  const t = Math.min(1, v / vmax);
+  // Dark blue -> Cyan -> Green -> Yellow
+  if (t < 0.25) { const s = t/0.25; return `rgb(0,${Math.round(s*80)},${Math.round(40+s*160)})`; }
+  if (t < 0.5) { const s = (t-0.25)/0.25; return `rgb(0,${80+Math.round(s*120)},${200-Math.round(s*60)})`; }
+  if (t < 0.75) { const s = (t-0.5)/0.25; return `rgb(${Math.round(s*200)},${200+Math.round(s*55)},${140-Math.round(s*140)})`; }
+  const s = (t-0.75)/0.25; return `rgb(${200+Math.round(s*55)},255,${Math.round(s*100)})`;
+}
+
+function szColor(v) {
+  // -2 (red) to 0 (black) to +2 (blue)
+  const t = v / 2.0;
+  if (t >= 0) {
+    const s = Math.min(1, t);
+    return `rgb(${Math.round(40+s*20)},${Math.round(40+s*100)},${Math.round(80+s*175)})`;
+  } else {
+    const s = Math.min(1, -t);
+    return `rgb(${Math.round(80+s*175)},${Math.round(40+s*20)},${Math.round(40+s*20)})`;
+  }
+}
+
+const grid = document.getElementById('grid');
+
+// 1. Truncation error heatmap
+grid.appendChild(createHeatmap('trunc',
+  'Truncatie-fout per bond',
+  'Waar en wanneer informatie verloren gaat door SVD-compressie. Helder = meer verlies.',
+  DATA.trunc_error, DATA.bond_labels,
+  truncColor, v => v < 1e-10 ? '~0' : v.toExponential(2), true
+));
+
+// 2. Entanglement entropy heatmap
+grid.appendChild(createHeatmap('entropy',
+  'Entanglement entropie per bond',
+  'Hoeveel kwantumverstrengeling er zit op elke bond. Maximum = ln(32) = 3.47.',
+  DATA.entropy, DATA.bond_labels,
+  entropyColor, v => v.toFixed(3), false
+));
+
+// 3. Magnetization heatmap (full width)
+const szPanel = createHeatmap('sz',
+  'Magnetisatie (Sz) per laag',
+  'De schokgolf: laag 4 start bij Sz=-2 (rood) en verspreidt zich naar blauw (+2). Watch the wave.',
+  DATA.sz, DATA.site_labels,
+  (v) => szColor(v), v => (v>=0?'+':'') + v.toFixed(3), false
+);
+szPanel.classList.add('full-width');
+grid.appendChild(szPanel);
+
+// 4. Combined time series (full width)
+const tsPanel = document.createElement('div');
+tsPanel.className = 'panel full-width';
+tsPanel.innerHTML = `<div class="panel-title">Tijdreeks: truncatie-piek vs entropie-piek</div>
+<div class="panel-desc">De race tussen informatiegroei (entropie, blauw) en informatieverlies (truncatie, oranje).</div>`;
+const tsCanvas = document.createElement('canvas');
+tsCanvas.width = 700; tsCanvas.height = 200;
+tsCanvas.style.maxWidth = '100%'; tsCanvas.style.height = 'auto';
+const tctx = tsCanvas.getContext('2d');
+tctx.fillStyle = '#0d0d18';
+tctx.fillRect(0, 0, 700, 200);
+
+// Plot max truncation and max entropy over time
+const padTL = 50, padTR = 50, padTT = 20, padTB = 30;
+const plotW = 700 - padTL - padTR, plotH = 200 - padTT - padTB;
+
+// Axes
+tctx.strokeStyle = '#333'; tctx.lineWidth = 1;
+tctx.beginPath(); tctx.moveTo(padTL, padTT); tctx.lineTo(padTL, padTT+plotH); tctx.lineTo(padTL+plotW, padTT+plotH); tctx.stroke();
+
+const maxE = Math.max(...DATA.entropy.flat());
+const maxTr = Math.max(...DATA.trunc_error.flat());
+
+// Entropy line (left axis, blue)
+tctx.strokeStyle = '#4488ff'; tctx.lineWidth = 2;
+tctx.beginPath();
+for (let i = 0; i < nT; i++) {
+  const maxS = Math.max(...DATA.entropy[i]);
+  const x = padTL + (i/(nT-1)) * plotW;
+  const y = padTT + plotH - (maxS / maxE) * plotH;
+  if (i === 0) tctx.moveTo(x, y); else tctx.lineTo(x, y);
+}
+tctx.stroke();
+
+// Truncation line (right axis, orange)
+tctx.strokeStyle = '#ff8844'; tctx.lineWidth = 2;
+tctx.beginPath();
+for (let i = 0; i < nT; i++) {
+  const maxT = Math.max(...DATA.trunc_error[i]);
+  const x = padTL + (i/(nT-1)) * plotW;
+  const y = padTT + plotH - (maxTr > 0 ? (maxT / maxTr) * plotH : 0);
+  if (i === 0) tctx.moveTo(x, y); else tctx.lineTo(x, y);
+}
+tctx.stroke();
+
+// Labels
+tctx.fillStyle = '#4488ff'; tctx.font = '11px system-ui'; tctx.textAlign = 'center';
+tctx.fillText('S_max', padTL - 20, padTT + 10);
+tctx.fillStyle = '#ff8844';
+tctx.fillText('trunc', padTL + plotW + 24, padTT + 10);
+tctx.fillStyle = '#888';
+tctx.fillText('t', padTL + plotW/2, padTT + plotH + 22);
+tctx.textAlign = 'left';
+tctx.fillText(`0`, padTL, padTT + plotH + 14);
+tctx.textAlign = 'right';
+tctx.fillText(DATA.times[nT-1].toFixed(2), padTL + plotW, padTT + plotH + 14);
+
+tsPanel.appendChild(tsCanvas);
+grid.appendChild(tsPanel);
+</script>
+</body>
+</html>

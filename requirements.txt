@@ -1,0 +1,36 @@
+# ZornQ core requirements
+# Python >= 3.10 vereist (getest op 3.10 en 3.12).
+# Versies gepinned op bekende-werkende combinaties per april 2026.
+# Pinnen met >= + <, zodat patch-updates nog mogen, maar major-bumps expliciet worden.
+
+# --- Core wetenschappelijk ---
+numpy>=2.0,<3.0
+scipy>=1.11,<2.0           # scipy.optimize.milp (HiGHS) sinds 1.9; wij testen op 1.15
+cvxpy>=1.5,<2.0            # B60 / B156 SDP-referentie (SCS backend)
+
+# --- Graaf & plotting ---
+networkx>=3.0,<4.0         # graph utilities (optioneel maar gebruikt in B80/B158)
+matplotlib>=3.8,<4.0       # B177 figures-pipeline
+
+# --- Data & I/O ---
+pandas>=2.0,<3.0           # benchmark tables (B137/B154/B186)
+psutil>=5.9                # audit_trail environment-snapshot
+
+# --- Testing ---
+pytest>=8.0,<10.0
+
+# --- Optional: quantum hardware (B165) ---
+# Uncomment voor Qiskit-runtime-pad:
+# qiskit>=1.0,<3.0
+# qiskit-aer>=0.14
+# qiskit-ibm-runtime>=0.20
+
+# --- Optional: GPU (B11b/B65/B136) ---
+# Uncomment + kies cuda-variant:
+# cupy-cuda12x>=13.0        # voor CUDA 12
+# cupy-cuda11x>=13.0        # voor CUDA 11
+
+# --- Optional: alternatieve ILP-backends (B159) ---
+# Uncomment voor SCIP/Gurobi-paden naast HiGHS:
+# pyscipopt>=5.0
+# gurobipy>=11.0           # vereist Gurobi-licentie

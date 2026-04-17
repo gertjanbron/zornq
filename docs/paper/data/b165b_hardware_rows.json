@@ -1,0 +1,36 @@
+[
+  {
+    "instance": "3reg8",
+    "n": 8,
+    "m": 12,
+    "opt": 10.0,
+    "exp_noiseless": 8.00244140625,
+    "exp_depolarising": 7.918212890625,
+    "exp_cal_mirror": 7.927978515625,
+    "exp_hardware": 7.762939453125,
+    "best_hardware": 10,
+    "backend_name": "ibm_kingston",
+    "approx_ratio": 0.7762939453125,
+    "gammas": [],
+    "betas": []
+  },
+  {
+    "instance": "myciel3",
+    "n": 11,
+    "m": 20,
+    "opt": 16.0,
+    "exp_noiseless": 12.837646484375,
+    "exp_depolarising": 12.675048828125,
+    "exp_cal_mirror": 12.73828125,
+    "exp_hardware": 12.36669921875,
+    "best_hardware": 16,
+    "backend_name": "ibm_kingston",
+    "approx_ratio": 0.772918701171875,
+    "gammas": [
+      0.210083823873147
+    ],
+    "betas": [
+      1.2111549948380762
+    ]
+  }
+]

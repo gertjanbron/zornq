@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>ZornQ Audit — e722b6c97f3b</title>
+<style>
+  body { font-family: 'Segoe UI', system-ui, sans-serif; max-width: 800px;
+         margin: 2em auto; padding: 0 1em; color: #1a1a1a; }
+  h1 { font-size: 1.4em; border-bottom: 2px solid #333; padding-bottom: 0.3em; }
+  h2 { font-size: 1.1em; color: #555; margin-top: 1.5em; }
+  .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 0.3em 2em;
+          background: #f5f5f5; padding: 0.8em 1em; border-radius: 6px; font-size: 0.9em; }
+  .meta dt { font-weight: 600; }
+  .meta dd { margin: 0; }
+  .ratio { font-size: 2em; font-weight: 700; color: #b8860b; }
+  table { border-collapse: collapse; width: 100%; margin: 0.5em 0; }
+  th, td { text-align: left; padding: 0.4em 0.8em; border-bottom: 1px solid #ddd; }
+  th { background: #f0f0f0; font-weight: 600; }
+  .warn { background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px;
+          padding: 0.5em 1em; margin: 1em 0; }
+  .dirty { background: #dc3545; color: white; padding: 0.1em 0.4em;
+           border-radius: 3px; font-size: 0.8em; }
+  .footer { color: #888; font-size: 0.8em; margin-top: 2em; border-top: 1px solid #ddd;
+            padding-top: 0.5em; }
+</style>
+</head>
+<body>
+<h1>ZornQ Audit Trail</h1>
+
+<dl class="meta">
+  <dt>Run ID</dt><dd><code>e722b6c97f3b</code></dd>
+  <dt>Timestamp</dt><dd>2026-04-12T10:58:19.690268+00:00</dd>
+  <dt>Graaf</dt><dd>grid_6x3</dd>
+  <dt>p</dt><dd>2</dd>
+  <dt>Methode</dt><dd>lightcone</dd>
+  <dt>Seed</dt><dd>42</dd>
+  <dt>Git</dt><dd><code>unknown</code> (unknown)</dd>
+  <dt>GPU</dt><dd>none (0 MB)</dd>
+  <dt>Host</dt><dd>claude</dd>
+  <dt>RAM</dt><dd>3915 MB</dd>
+</dl>
+
+
+
+<h2>Resultaat</h2>
+<p class="ratio">0.790700</p>
+<p>Totale tijd: 0.2s</p>
+<p><b>Gammas:</b> 0.3140, 0.3140</p>
+<p><b>Betas:</b> 1.1780, 1.1780</p>
+
+<p><b>Bounds:</b> bks=27, greedy=22</p>
+
+<h2>Optimalisatie-fasen</h2>
+<table>
+<tr><th>Fase</th><th>Ratio</th><th>Tijd</th><th>Evaluaties</th></tr>
+<tr><td>grid_search</td><td>0.669700</td><td>0.3s</td><td>100</td></tr>
+<tr><td>scipy_p1</td><td>0.688400</td><td>0.1s</td><td>18</td></tr>
+<tr><td>warmstart_p2</td><td>0.705800</td><td>0.0s</td><td>1</td></tr>
+<tr><td>scipy_p2</td><td>0.790700</td><td>2.9s</td><td>361</td></tr>
+
+</table>
+
+<p><b>Diagnostics:</b> max_lightcone_qubits=12, n_edges_computed=27, n_edges_cached=15, cache_hit_rate=0.5560</p>
+
+<div class="footer">
+  Gegenereerd door audit_trail.py v1.0.0
+</div>
+</body>
+</html>

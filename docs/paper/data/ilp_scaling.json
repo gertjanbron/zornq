@@ -1,0 +1,91 @@
+{
+  "meta": {
+    "timestamp": "2026-04-16 23:05:56",
+    "ilp_time_limit": 10.0,
+    "graph_type": "random_uniform_3reg_target",
+    "sizes": [
+      10,
+      14,
+      18
+    ],
+    "seeds": [
+      0,
+      1,
+      2
+    ]
+  },
+  "points": [
+    {
+      "n": 10,
+      "m": 15,
+      "seed": 0,
+      "t_ilp": 0.004136323928833008,
+      "opt": 13.0,
+      "certified": true
+    },
+    {
+      "n": 10,
+      "m": 15,
+      "seed": 1,
+      "t_ilp": 0.002956390380859375,
+      "opt": 13.0,
+      "certified": true
+    },
+    {
+      "n": 10,
+      "m": 15,
+      "seed": 2,
+      "t_ilp": 0.008197307586669922,
+      "opt": 12.0,
+      "certified": true
+    },
+    {
+      "n": 14,
+      "m": 21,
+      "seed": 0,
+      "t_ilp": 0.011897802352905273,
+      "opt": 18.0,
+      "certified": true
+    },
+    {
+      "n": 14,
+      "m": 21,
+      "seed": 1,
+      "t_ilp": 0.011963605880737305,
+      "opt": 16.0,
+      "certified": true
+    },
+    {
+      "n": 14,
+      "m": 21,
+      "seed": 2,
+      "t_ilp": 0.010259151458740234,
+      "opt": 18.0,
+      "certified": true
+    },
+    {
+      "n": 18,
+      "m": 27,
+      "seed": 0,
+      "t_ilp": 0.03183913230895996,
+      "opt": 23.0,
+      "certified": true
+    },
+    {
+      "n": 18,
+      "m": 27,
+      "seed": 1,
+      "t_ilp": 0.004762411117553711,
+      "opt": 24.0,
+      "certified": true
+    },
+    {
+      "n": 18,
+      "m": 27,
+      "seed": 2,
+      "t_ilp": 0.02002549171447754,
+      "opt": 23.0,
+      "certified": true
+    }
+  ]
+}
