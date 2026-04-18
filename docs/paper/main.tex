@@ -254,6 +254,7 @@ output to one of four levels: \textsc{Exact} (\ILP-certified $\OPT$),
 \begin{table}[t]
   \centering
   \small
+  \resizebox{\linewidth}{!}{%
   \begin{tabular}{llll}
     \toprule
     \textbf{Component} & \textbf{Role}          & \textbf{Guarantee} & \textbf{Scales to}\\
@@ -263,9 +264,9 @@ output to one of four levels: \textsc{Exact} (\ILP-certified $\OPT$),
     Cograph-DP          & Exact on cographs       & Exact              & $n \lesssim 500$ \\
     \MPQS-BP            & Local LB                & Heuristic          & $n \lesssim 10^4$ \\
     \MPQS-Lightcone     & Local \QAOA $\zeta_{uv}$ & Heuristic         & $n \lesssim 10^3$ \\
-    \QAOA (Aer / runtime) & Quantum LB, hardware-matched & Heuristic   & $n \lesssim 30$ (sim), $n \le 127$ (hw) \\
+    \QAOA (Aer / runtime) & Quantum LB, hw-matched & Heuristic   & $n \lesssim 30$ (sim), $n \le 127$ (hw) \\
     \bottomrule
-  \end{tabular}
+  \end{tabular}}
   \caption{Core pipeline components, their role in the sandwich, and the
     instance sizes for which each remains tractable on a single workstation.}
   \label{tab:components}
@@ -362,7 +363,7 @@ $\alpha_{\GW} \approx 0.879$.
 \subsection{SDP-scaling via CGAL}
 
 The companion CGAL-SDP solver (B176b, following
-\citet{yurtsever2019cgal}) extends the sandwich to $n = 2000$ with
+\textcite{yurtsever2019cgal}) extends the sandwich to $n = 2000$ with
 provable dual certificates derived from weak duality:
 $\mathrm{cut}_{\SDP} \le \langle y, \mathbf{1}\rangle
 - n\,\lambda_{\min}(-L/4 + \diag(y))$ for every $y \in \Reals^n$.
@@ -579,6 +580,7 @@ and gate errors), and hardware. \cref{tab:hardware} and
 
 \begin{table}[t]
   \centering\small
+  \resizebox{\linewidth}{!}{%
   \begin{tabular}{lrrrrrrrrrr}
     \toprule
     \textbf{Instance} & $n$ & $m$ & $\OPT$
@@ -588,7 +590,7 @@ and gate errors), and hardware. \cref{tab:hardware} and
     \texttt{3reg8}    &  8 & 12 & 10 &  8.002 &  7.918 &  7.928 &  7.763 & 10 & \texttt{ibm\_kingston} & 0.776\\
     \texttt{myciel3}  & 11 & 20 & 16 & 12.838 & 12.675 & 12.738 & 12.367 & 16 & \texttt{ibm\_kingston} & 0.773\\
     \bottomrule
-  \end{tabular}
+  \end{tabular}}
   \caption{\QAOA $p{=}1$ hardware run on \textsc{ibm\_kingston},
     $4096$ shots, $(\gamma^\ast, \beta^\ast)$ from the pre-submit
     grid-search. Values are QAOA expectations $\mathbb{E}[H_C]$;
