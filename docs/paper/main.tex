@@ -110,7 +110,8 @@ our offline Aer calibration-mirror predicts the hardware expectation to
 within $1.6$--$2.9\%$. The measured $p{=}1$ ratio is
 approximately $12\%$ above the Farhi--Goldstone--Gutmann asymptotic bound
 for $3$-regular graphs~\cite{farhi2014quantum}. All experiments are
-reproducible on a single workstation (GTX\,1650-class GPU, 16\,GB RAM)
+reproducible on a single workstation (GTX\,1650-class GPU, 16\,GB RAM;
+classical experiments; hardware runs require IBM Quantum access)
 via a pinned \textsc{Docker} image and a deterministic seed ledger.
 \end{abstract}
 
@@ -258,7 +259,7 @@ output to one of four levels: \textsc{Exact} (\ILP-certified $\OPT$),
     \textbf{Component} & \textbf{Role}          & \textbf{Guarantee} & \textbf{Scales to}\\
     \midrule
     \ILP oracle (HiGHS) & Certify $\OPT$          & Exact              & $n \lesssim 50$ \\
-    FW-\SDP sandwich    & Anytime $\LB \le \OPT \le \UB$ & Near-exact / Bounded & $n \lesssim 500$ \\
+    FW-\SDP sandwich    & Anytime $\LB \le \OPT \le \UB$ & Near-exact / Bounded & $n \lesssim 2000$ \\
     Cograph-DP          & Exact on cographs       & Exact              & $n \lesssim 500$ \\
     \MPQS-BP            & Local LB                & Heuristic          & $n \lesssim 10^4$ \\
     \MPQS-Lightcone     & Local \QAOA $\zeta_{uv}$ & Heuristic         & $n \lesssim 10^3$ \\
@@ -344,10 +345,12 @@ and the feasible primal lower bound $\LB_k = \tfrac14 \tr(L \hat X_k)$
 is obtained by rescaling $Y_k$ so that $\hat X_k$ satisfies
 $\diag(\hat X_k) = \bm{1}$. Together, $\LB_k \le \OPT \le \UB_k$ forms
 the sandwich that drives \cref{fig:anytime}. On $3$-regular
-graphs $n = 30\,\text{--}\,500$ the \FW solver matches \textsc{cvxpy}
-on all cases where the latter remains feasible ($n \le 300$), and is
-$3.9\times$ faster at $n = 200$; for $n > 300$, \textsc{cvxpy} runs out
-of memory and \FW continues to deliver sandwich certificates.
+graphs $n = 30\,\text{--}\,2000$ the \FW solver matches \textsc{cvxpy}
+on all cases where the latter remains feasible ($n \le 300$)
+and continues to deliver sandwich certificates beyond that range;
+see \cref{tab:b176b-scale} for head-to-head timings showing that CGAL
+matches FW within $5$--$10\%$ on small~$n$ while providing a provable
+dual certificate.
 
 \paragraph{Rounding and GW upper bound.} GW hyperplane
 rounding~\cite{goemans1995improved} applied to $Y_k$ yields a
@@ -355,6 +358,18 @@ rounding~\cite{goemans1995improved} applied to $Y_k$ yields a
 experiments the measured ratio $\LB / \UB$ ranges from $0.95$ to $0.99$
 on all panel instances, well above the worst-case
 $\alpha_{\GW} \approx 0.879$.
+
+\subsection{SDP-scaling via CGAL}
+
+The companion CGAL-SDP solver (B176b, following
+\citet{yurtsever2019cgal}) extends the sandwich to $n = 2000$ with
+provable dual certificates derived from weak duality:
+$\mathrm{cut}_{\SDP} \le \langle y, \mathbf{1}\rangle
+- n\,\lambda_{\min}(-L/4 + \diag(y))$ for every $y \in \Reals^n$.
+\cref{tab:b176b-scale} reports wall-time, certified UB, and
+GW-rounded LB across 5 seeds per $n \in \{500, 1000, 2000\}$.
+
+\input{tables/b176b_scale_table.tex}
 
 \begin{figure}[t]
   \centering
@@ -406,9 +421,10 @@ $\tww = 0 \Leftrightarrow$ cograph, we detect the property by the
 standard $P_4$-free test~\cite{corneil1981linear} and, when positive,
 run an exact $\Oh(n^3)$ \MaxCut dynamic program on the cotree.
 Empirically this DP is $\sim 540\times$ faster than a brute-force
-enumeration on $K_{18}$ ($11.6$\,ms vs.\ $6226$\,ms) and matches the
+enumeration on $K_{18}$ ($11.6$\,ms vs.\ $6226$\,ms)\footnote{Measured in \texttt{test\_b170\_twin\_width.py::test\_cograph\_dp\_k18\_benchmark}.} and matches the
 brute-force cut on every testable case.
 
+\begin{sloppypar}
 \paragraph{Routing.} Given an instance, the dispatcher classifies by:
 $n$ (small-$n$ oracle for $n \le 18$ via $\Oh(2^n)$ exhaustive search),
 weightedness, cograph-status, planarity~\cite{kasteleyn1963dimer,hadlock1975finding},
@@ -417,11 +433,13 @@ cograph-DP $\to$ pfaffian-exact (planar, unweighted) $\to$ MILP (small)
 $\to$ FW-SDP sandwich (large). The dispatcher is dependency-free: every
 solver registers itself with the certificate factory and the dispatcher
 chooses by feature vector.
+\end{sloppypar}
 
 % ===================================================================
 \section{QAOA: simulation and hardware}
 \label{sec:qaoa}
 
+\begin{sloppypar}
 For the quantum path, we employ standard $p{=}1$ $\QAOA$~\cite{farhi2014quantum,wang2018quantum}:
 \begin{equation}
   |\psi_{\gamma,\beta}\rangle
@@ -430,6 +448,7 @@ For the quantum path, we employ standard $p{=}1$ $\QAOA$~\cite{farhi2014quantum,
   \left(\prod_{(u,v) \in E}\! e^{-i \gamma\, \tfrac12 (I - Z_u Z_v)}\right)
   \,|+\rangle^{\otimes n}.
 \end{equation}
+\end{sloppypar}
 The $(\gamma, \beta) \in (0, \pi)^2$ grid is explored via a $20 \times 20$
 noiseless Aer search selecting the pair that maximises
 $\mathbb{E}[H_C]$. The optimal circuit is then executed along three
@@ -466,7 +485,7 @@ and the dispatcher's automatic choice. All \ILP runs certify $\OPT$ in
 $14/14$ cases. The FW-\SDP sandwich-ratio $\LB_{\FW} / \UB_{\FW}$ lies in $[0.95, 1.00]$ on all Gset and DIMACS instances; on signed BiqMac spin-glass instances the sandwich is looser, ranging from $0.69$ (\texttt{spinglass2d\_L5\_s0}) to $0.93$ (\texttt{torus2d\_L4\_s1}), reflecting a well-known weakness of \GW-style relaxations on frustrated signed instances. (On three of the five signed rows the \emph{unsigned}-Laplacian lower bound actually exceeds the signed $\OPT$; see \cref{tab:selector} note $^\ddagger$.)
 
 \paragraph{Failure modes and the signed-instance patch.} The dispatcher's
-automatic strategy certifies $\OPT$ on all $14/14$ instances in the panel
+automatic strategy certifies \textsc{Exact} on $13/14$ instances and \textsc{Approximate} on $1/14$ (\texttt{spinglass2d\_L5\_s0}) in the panel
 after the Dag-8 layered defense was activated in B130: signed instances
 (detected by negative edge weights) bypass \texttt{pfaffian\_exact} and
 \texttt{exact\_small} and are instead routed through
@@ -535,7 +554,7 @@ wall-clock $\approx 3$\,s on a GTX~1650-class machine) we have
   16 \;=\; \LB \;\le\; \OPT \;=\; 16 \;\le\; \UB \;=\; 17.32,
   \qquad \text{gap} = 7.61\%.
 \end{equation}
-This is the first publicly-documented sandwich on \texttt{myciel3} at
+To our knowledge, this is the first publicly-documented sandwich on \texttt{myciel3} at
 this resolution and also validates the cross-module certificate bridge
 (\FW sandwich $\times$ \ILP oracle $\times$ GW rounding $\times$ $1$-flip
 polish). The figure is reproducible from
@@ -672,7 +691,9 @@ gap, not a hardware artefact. Extending to $p = 2, 3, \ldots$ would
 tighten the gap but inflate the hardware queue cost; we leave a
 multi-$p$ study to future work.
 
+\begin{sloppypar}
 \paragraph{FW sandwich on signed instances.} The Frank-Wolfe module operates on the unsigned $|w|$-Laplacian. On graph problems with negative edge weights, this means that while $\UB_{\FW}$ continues to bound signed $\OPT$ efficiently, the feasible primal bound $\LB_{\FW}$ only guarantees a bound for the unsigned MaxCut, which can exceed the signed MaxCut optimum. This violation of the sandwich invariant ($\LB_{\FW} > \OPT$) is evident on three BiqMac instances in \cref{tab:selector}; a sign-aware FW backend that directly optimizes the signed Laplacian is a required next step for full certification of frustrated inputs.
+\end{sloppypar}
 
 \paragraph{Cograph-only exact path.} The twin-width dispatcher's
 \emph{exact} exit today is cograph-DP ($\tww = 0$). The natural
