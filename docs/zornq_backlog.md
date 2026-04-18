@@ -6046,3 +6046,6 @@ precies wat B122 (Loop Calculus / Generalized BP) zou oplossen.
 - Max-3-Cut baseline solver integreren (bv. via Frieze-Jerrum rounding)
 - Gset-loader uitbreiden met `gset/` directory-scanning
 - Leaderboard-output als JSON/Markdown voor paper-inclusion
+
+
+B179 KLAAR (17 apr 2026). Zenodo-DOI 10.5281/zenodo.19637389 gemint via GitHub-release paper-v1.0-2026-04-17 op snapshot-commit 9b7faa3. Bundle 437 files, 15.18 MB. Verificatie: docs/paper/ZENODO_CHECKSUMS.md matcht Zenodo-tarball. Paper-cite: main.tex §17 + refs.bib @zornq2026code. Repro-anchor voor venue-submission.

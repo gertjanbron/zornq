@@ -382,3 +382,6 @@ Niet-paper-blokken met hoge intrinsieke waarde:
 1. ~~**B41** TDQS — fundamenteel nieuw algoritme~~ BEWEZEN (+4-5% vs QAOA-1)
 6. **B10f** Classical Shadows — chi-onafhankelijke energy estimation
 7. **B40** iTEBD-QAOA — exacte N naar oneindig limiet (publicatiewaardig)
+
+
+B179 Zenodo open release KLAAR (DOI 10.5281/zenodo.19637389)
