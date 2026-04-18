@@ -1,27 +1,21 @@
 {
-      "title": "ZornQ: Anytime MaxCut with Sandwich Certificates and Real-Hardware QAOA Validation - Research Code and Paper Sources",
-      "description": "Companion artefact to the ZornQ B4 paper-1. Includes all Python source code, LaTeX paper sources, figures, tables, hardware job-bundles from an ibm_kingston QAOA run, and a pinned Docker container for reproducible replay.",
-      "creators": [
-                {
-                              "name": "Bron, Gertjan",
-                              "affiliation": "Independent researcher"
-                }
-      ],
-      "keywords": [
-                "MaxCut",
-                "Frank-Wolfe SDP",
-                "QAOA",
-                "octonion",
-                "reproducible research",
-                "twin-width",
-                "ILP oracle",
-                "sandwich certificate",
-                "IBM Quantum",
-                "ibm_kingston"
-      ],
-      "license": "MIT",
-      "access_right": "open",
-      "upload_type": "software",
-      "version": "1.0.0",
-      "publication_date": "2026-04-17"
+    "title": "ZornQ: Anytime MaxCut with Sandwich Certificates and Real-Hardware QAOA Validation - Research Code and Paper Sources",
+    "description": "Companion artefact to the ZornQ B4 paper-1. Includes all Python source code, LaTeX paper sources, figures, tables, hardware job-bundles from an ibm_kingston QAOA run, and a pinned Docker container for reproducible replay.",
+    "creators": [
+        {
+            "name": "Bron, Gertjan",
+            "affiliation": "Independent researcher"
+        }
+    ],
+    "keywords": [
+        "MaxCut",
+        "Frank-Wolfe SDP",
+        "QAOA",
+        "octonion"
+    ],
+    "license": "MIT",
+    "access_right": "open",
+    "upload_type": "software",
+    "version": "1.0.0",
+    "publication_date": "2026-04-17"
 }
