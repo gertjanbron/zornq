@@ -19,6 +19,11 @@ psutil>=5.9                # audit_trail environment-snapshot
 # --- Testing ---
 pytest>=8.0,<10.0
 
+# --- Optional: ML classifier (B184) ---
+# Gebruikt door b184_difficulty_classifier.py voor RF/GB backend;
+# zonder sklearn valt de module terug op _NumpyThresholdClassifier.
+scikit-learn>=1.3,<2.0
+
 # --- Optional: quantum hardware (B165) ---
 # Uncomment voor Qiskit-runtime-pad:
 # qiskit>=1.0,<3.0

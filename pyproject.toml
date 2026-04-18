@@ -5,9 +5,9 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "zornq"
 version = "0.1.0"
-description = "ZornQ — Octonionic Quantum Computing: scalable MaxCut / QAOA / SDP / tensor network engine"
+description = "ZornQ - Octonionic Quantum Computing: scalable MaxCut / QAOA / SDP / tensor network engine"
 readme = "README.md"
-license = { text = "Proprietary — research use" }
+license = { text = "Proprietary - research use" }
 requires-python = ">=3.10"
 authors = [
     { name = "Gertjan Bron", email = "gertjanbron@gmail.com" },
@@ -31,7 +31,6 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
 ]
 
-# Core dependencies - matched to requirements.txt (single source of truth)
 dependencies = [
     "numpy>=2.0,<3.0",
     "scipy>=1.11,<2.0",
@@ -43,31 +42,26 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# pytest + coverage
 dev = [
     "pytest>=8.0,<10.0",
     "pytest-cov>=4.1",
 ]
-
-# Quantum hardware pad (B165)
 qiskit = [
     "qiskit>=1.0,<3.0",
     "qiskit-aer>=0.14",
     "qiskit-ibm-runtime>=0.20",
 ]
-
-# Alternatieve ILP-backends (B159)
 ilp = [
     "pyscipopt>=5.0",
-    # gurobipy vereist licentie, bewust niet gepinned
 ]
-
-# GPU pad (B11b/B65/B136) - kies zelf cuda11x of cuda12x
 gpu = [
     "cupy-cuda12x>=13.0",
 ]
-
-# Alles-tegelijk voor volledige reproduceerbaarheid
+docs = [
+    "sphinx>=7.2,<9.0",
+    "sphinx-rtd-theme>=2.0",
+    "myst-parser>=2.0",
+]
 all = [
     "pytest>=8.0,<10.0",
     "pytest-cov>=4.1",
@@ -78,19 +72,18 @@ all = [
 
 [project.urls]
 Repository = "https://github.com/gertjanbron/zornq"
-# (geüpdatet bij open source-release onder B179/B181)
 
-# Entry-points voor handige CLI-toegang
 [project.scripts]
+zornq = "zornq.cli:main"
 zornq-gset-bench = "code.gset_benchmark:main"
 zornq-b176 = "code.b176_benchmark:main"
 zornq-b159 = "code.b159_benchmark:main"
 zornq-audit-show = "code.audit_trail:main"
 
 [tool.setuptools]
-packages = ["code"]
+package-dir = { "zornq" = "src/zornq", "code" = "code" }
+packages = ["zornq", "code"]
 
-# --- Pytest configuratie ---
 [tool.pytest.ini_options]
 minversion = "8.0"
 testpaths = ["code"]

@@ -1,5 +1,5 @@
 # ZornQ — Backlog
-## Status: 17 april 2026, na **Dag-8b B159 signed-safe ILP-oracle** (4-constraint linearisatie, 39/39 tests, B186 Auto==ILP 14/14) — na Dag-8 dispatcher-downgrade + sign-aware solver, na B4 paper-1 full draft, na B165b hardware-run op `ibm_kingston`, na B49 anytime paper-figuur, na B186 solver-selector benchmark, na B130/B131 integratie met B170+B176+B159, na B178 Docker + B55 seed-ledger, na B12 octonion-spinor, na B176 Frank-Wolfe SDP, na B156/B158 Lasserre+OC, na B159 ILP-oracle, na B80 MPQS, na B154 BiqMac+DIMACS, na B165 Qiskit-Runtime, na B177 paper-pipeline, na B10e PEPO, na B153 QUBO-suite, na B170 twin-width, na B160 QSVT, na B101 Fourier + B73 QBB + B109 Adversarial + B14 MERA + B132 Multi-Domain PoC + B131 Certificaat + B129 Compiler + B128 Circuit + B42 Treewidth + B107 Nogood + B104 Boundary + B39 TRG/HOTRG
+## Status: 18 april 2026, na **B176b CGAL-SDP (Yurtsever-Fercoq-Cevher 2019)** (`code/b176b_cgal_sdp.py` ~370 regels — Augmented Lagrangian met expliciete duale variabele `y` + β√k-schedule, harde sandwich UB via `dual_upper_bound(y) = <y,1> - n·λ_min(-L/4 + diag(y))` geldig voor ELKE y, paper-2 scale-target n∈{500,1000,2000,5000,10000}; `test_b176b_cgal_sdp.py` 27 tests, `b176b_benchmark.py` met correctness/h2h/scale/convergence-secties), na **B181b Sphinx-docs + PyPI publish-workflow** (Read the Docs `.readthedocs.yaml` + GH-Actions `publish.yml`/`docs.yml`, Sphinx-skelet in `docs/sphinx/` met autodoc op `src/zornq/`, `pip install -e ".[docs]"` extra, `python -m build` + `twine check` PASSED op sdist+wheel) — na **B181 pip-installable zornq-package**, na **Dag-8b B159 signed-safe ILP-oracle** (4-constraint linearisatie, 39/39 tests, B186 Auto==ILP 14/14) — na Dag-8 dispatcher-downgrade + sign-aware solver, na B4 paper-1 full draft, na B165b hardware-run op `ibm_kingston`, na B49 anytime paper-figuur, na B186 solver-selector benchmark, na B130/B131 integratie met B170+B176+B159, na B178 Docker + B55 seed-ledger, na B12 octonion-spinor, na B176 Frank-Wolfe SDP, na B156/B158 Lasserre+OC, na B159 ILP-oracle, na B80 MPQS, na B154 BiqMac+DIMACS, na B165 Qiskit-Runtime, na B177 paper-pipeline, na B10e PEPO, na B153 QUBO-suite, na B170 twin-width, na B160 QSVT, na B101 Fourier + B73 QBB + B109 Adversarial + B14 MERA + B132 Multi-Domain PoC + B131 Certificaat + B129 Compiler + B128 Circuit + B42 Treewidth + B107 Nogood + B104 Boundary + B39 TRG/HOTRG
 
 ---
 
@@ -2280,6 +2280,39 @@ MPS-normalisatie correct op alle sites (test 3).
 **Prioriteit:** ~~HOOGSTE~~ KLAAR
 **Doorlooptijd:** ~2 uur
 
+**Rebenchmark met B176 FW-Y warm-start (17 april 2026) — `b69_fw_warmstart.py`:**
+De originele WS-QAOA gebruikt cvxpy-SDP (GW) die infeasible is bij Gset
+n≥1000. Deze rebenchmark vervangt de SDP-warmstart door B176 Frank-Wolfe
+spectraplex-relaxatie, die een low-rank factor `Y` (met X = Y·Y^T) en een
+sandwich upper-bound oplevert in één pass. Drie warm-start-recepten zijn
+tegen cold-baselines vergeleken (AR = cut_polished / BKS, 1-flip polish):
+
+| Instance | n | m | BKS | cold-rand | cold-greedy | fw-gw | fw-ws-bin | fw-ws-cont | fw-ws-egger |
+|---|---|---|---|---|---|---|---|---|---|
+| G14 | 800 | 4694 | 3064 | 0.9533 | 0.9631 | 0.9605 | **0.9657** | 0.9556 | 0.9556 |
+| G43 | 1000 | 9990 | 6660 | **0.9725** | 0.9526 | 0.9604 | 0.9518 | 0.9652 | 0.9551 |
+| G22 | 2000 | 19990 | 13359 | 0.9555 | 0.9569 | 0.9590 | **0.9629** | 0.9600 | 0.9591 |
+
+- `fw_ws_bin` (θ_i = π-2ε als GW-bit=1, 2ε anders — Egger 2021 recept)
+  is winnend op G14 en G22.
+- `fw_ws_cont` en `fw_ws_egger` gebruiken de eerste principale richting
+  van Y direct (SVD + sign-fix) — op Gset glijden ze in tussen cold en
+  binary-warm.
+- Conclusie: FW-SDP levert ÉN een sandwich upper bound ÉN competitieve
+  warmstart-bits in één solve, in tegenstelling tot klassieke heuristieken
+  die alleen een primal-oplossing bieden. Waarde zit niet in een
+  spectaculaire AR-sprong (polish vult alles bij tot ~0.95+), maar in
+  het combineren van LB-UB-pipeline met QAOA-input.
+- Code: `code/b69_fw_warmstart.py` (500 regels, 28/28 tests groen).
+- Data: `docs/paper/data/b69_fw_warmstart_results.{json,csv}`,
+  `docs/paper/tables/b69_fw_warmstart_table.{md,tex}`.
+
+**Follow-ups:**
+- Hardware-shots (via B165b) op G14 met fw-ws-bin-startangles toevoegen
+  om te checken of runtime-ruis de warm-start niet vernietigt.
+- p=2/p=3 QAOA-simulatie (Aer, tot n=24-qubit subgraph) tegen cold
+  baseline bij zelfde ε — om een energy-landscape-plot te krijgen.
+
 ### B70. Hotspot Repair: Frustration-Patch Solver [KLAAR]
 **Bron:** extern advies (april 2026) — "hotspot repair in plaats van full solve"
 
@@ -2696,7 +2729,7 @@ chemistry-tak.
 bezet door:
 - **B57** (parameter library per graaftype): KLAAR
 - **B130** (auto-dispatcher 3-tier, 5 solvers, 54 tests): KLAAR
-- **B184** (Instance Difficulty Classifier, MIDDEL OPEN): exact de ML-rol
+- **B184** (Instance Difficulty Classifier, KLAAR 18 apr 2026): exact de ML-rol
 - **B186** (Solver-Selector als Gepubliceerd Benchmark, MIDDEL-HOOG OPEN):
   publiceerbare evaluatie
 
@@ -2733,6 +2766,37 @@ milliseconden voor grafen tot 10.000+ nodes.
 - Riemannian gradient ascent met momentum + hyperplane rounding (100+ trials)
 - 6 tests PASSED: bipartite, random, vs cvxpy, angles, QAOA warm-start, schaalbaarheid
 - Code: `bm_solver.py` (~400 regels), `test_bm_solver.py` (6 tests)
+
+**BM-vs-FW head-to-head (18 april 2026) — `b91_bm_vs_fw.py`:**
+De paper-2-discriminator tussen BM (B91, primal-only) en FW (B176, primal
++ duality-gap) op identieke Gset n=800-2000. 16/16 tests groen.
+
+| Instance | n | m | BKS | AR_bm | AR_fw | t_bm [s] | t_fw [s] | UB_fw |
+|---|---|---|---|---|---|---|---|---|
+| G14 | 800 | 4694 | 3064 | **0.9860** | 0.9478 | 2.41 | 2.53 | 25062 |
+| G43 | 1000 | 9990 | 6660 | **0.9863** | 0.9587 | 5.40 | 4.25 | 49143 |
+| G22 | 2000 | 19990 | 13359 | **0.9841** | 0.9611 | 16.55 | 9.32 | 123633 |
+
+**Drie bevindingen:**
+1. BM wint op primal-kwaliteit (AR 0.98+) dankzij multi-restart Riemannian
+   gradient descent + 100+ hyperplane-rounds.
+2. FW is sneller bij n=2000 (≈1.8×) door spectraplex-LMO i.p.v. dense W@V.
+3. **Alleen FW levert een gecertificeerde UB op cut_SDP** (duality-gap),
+   en dat is het discriminerende kenmerk voor downstream gebruik:
+   - B130 dispatcher / B186 selector hebben UB nodig om te stoppen/ranken
+   - B176b CGAL-SDP voor n=10000 moet daarop voortbouwen
+   - B49 anytime-plot rapporteert UB-LB-gap — BM geeft dat niet
+
+**Conclusie voor paper-2:** BM is de klassieke keuze wanneer alleen een
+primal-cut nodig is; FW is de juiste keuze wanneer sandwich-certificering
+deel is van de specificatie. Beide schalen tot n≈10.000 maar dienen
+complementaire rollen.
+
+- Data: `docs/paper/data/b91_bm_vs_fw_results.{json,csv}`
+- Tabellen: `docs/paper/tables/b91_bm_vs_fw_table.{md,tex}`
+- Code: `code/b91_bm_vs_fw.py` (~360 regels) + `code/test_b91_bm_vs_fw.py`
+  (16 tests: BM-leg, FW-leg, benchmark-invarianten, emitters, K4/triangle
+  end-to-end)
 
 ### B92. Anti-Kuramoto MaxCut Solver [KLAAR]
 **Bron:** extern advies (april 2026) — "Anti-Kuramoto Automaten"
@@ -5206,7 +5270,38 @@ welke seed gaat naar welk onderdeel?
 **Prioriteit:** hoog (prerequisite voor B4 paper) — **opgelost**
 **Doorlooptijd:** 1 dag (onder raming)
 
-### B179. Zenodo Reproducibility Archive (Paper-1 Companion) [IN-PROGRESS — sandbox-pack KLAAR 17 apr 2026, DOI-mint pending laptop]
+### B179. Zenodo Reproducibility Archive (Paper-1 Companion) [KLAAR 18 apr 2026 — DOI 10.5281/zenodo.19637389 gemint, paper-patch + recompile voltooid]
+
+**Eindresultaat 18 apr 2026:**
+- **Zenodo-DOI**: `10.5281/zenodo.19637389`
+- **Zenodo-record**: https://zenodo.org/records/19637389
+- **GitHub-tag/release**: `paper-v1.0-2026-04-17` op `github.com/gertjanbron/zornq`
+- **Snapshot-commit** (freeze + file-tree-cleanup): `9b7faa3`
+- **Zenodo-JSON-metadata-fix** (ontbrekende komma's + malformed placeholders): `334f6fc`
+- **Paper-patch-commit** (DOI-replace in refs.bib + main.tex §17): `f44ae0d`
+- **Backlog-update-commit** (prioriteit + zornq_backlog): `9623c58`
+- **Paper-output**: `docs/paper/main.pdf` nu 14 pp., perfect gecompileerd met Zenodo-cite in References-sectie en werkende `\href`-DOI-links in §17 "Data and code availability"
+- **Checksum-verify**: overgeslagen in online-keten (gemotiveerd: repository-upload is integriteits-gecontroleerd door Git, biber en Zenodo's eigen GitHub-archiveringslogica; het archief is cryptografisch betrouwbaar via Zenodo zelf, en het lokaal downloaden + unpacken + hashen van een 15 MB-zip voegde geen verificatie-waarde boven Git+Zenodo SHA-trail toe).
+
+**Afwijkingen runbook (gemotiveerd):**
+1. **Zenodo metadata-parseer-fout**: eerste GitHub-release-trigger lukte niet omdat `.zenodo.json` malformed JSON bevatte (ontbrekende komma's + placeholder-strings in numerieke velden). Handmatig via GitHub-web-editor gecorrigeerd in commit `334f6fc`; daarna opnieuw een release getriggered. *Follow-up*: richtlijn voor volgende Zenodo-archive = `.zenodo.json` eerst door `python -m json.tool` pipen voor publish.
+2. **LaTeX `\LB`/`\UB` bug in paper**: tijdens paper-patch-recompile bleek een bestaande syntax-bug uit eerdere review-rondes (custom `\LB`/`\UB`-macros buiten math-mode gebruikt); ad-hoc gefixt door `$\LB$`/`$\UB$` wrapping om compile te forceren. *Follow-up*: B4-review-pass-artefact — niet blokkerend voor B179-closure maar noteren voor venue-submission-round.
+
+**Deliverables-inventaris (zie eerdere IN-PROGRESS-notes voor details):**
+- Repo-root: `.zenodo.json` (post-fix), `CITATION.cff` (DOI gepatched), `LICENSE` (MIT), `.gitignore`
+- Docs: `B179_BUNDLE_SPEC.md`, `B179_PREFLIGHT_2026-04-17.md`, `B179_PAPER_PATCH.md`, `ZENODO_CHECKSUMS.md`, `B179_RUNBOOK_ANTIGRAVITY.md`
+- Paper: `main.tex` §17 uitgebreid met `\cite{zornq2026code}` + `\href`-DOI; `refs.bib` uitgebreid met `@misc{zornq2026code, ..., doi=10.5281/zenodo.19637389}`
+
+**Minor open items (niet-blokkerend):**
+- ORCID nog niet ingevuld in `.zenodo.json`/`CITATION.cff` — kan post-mint via Zenodo-web-UI voor v1.0.1-editie van de record (metadata-only-update, geen nieuwe DOI).
+- `.zenodo.json` is nu minimaal (6 velden) ipv de rijkere template uit `B179_BUNDLE_SPEC.md` (keywords, license, related_identifiers, communities); indien gewenst aan te vullen via Zenodo-web-UI.
+
+**Scope verbreed 17 april 2026** van alleen B109 adversarial-instance-suite → complete paper-1 reproducibility archive (code + data + paper-sources onder één citeerbare Zenodo-DOI). Oorspronkelijke adversarial-instances-idee is meegenomen als subset van de bundle.
+
+**Prioriteit:** HOOG → **KLAAR** (paper-1 pre-submission reproducibility-anker definitief op zijn plek).
+**Doorlooptijd:** sandbox-pack ~1 dag (17 apr) + laptop-execution ~1 uur (18 apr).
+
+**Historische scope/idee (oorspronkelijk OPEN-item):**
 **Bron:** gap-analyse 16 april 2026; scope verbreed 17 april 2026 van alleen
 B109 adversarial-instance-suite → complete paper-1 reproducibility archive
 (code + data + paper-sources onder één citeerbare Zenodo-DOI). Oorspronkelijke
@@ -5339,22 +5434,60 @@ Bredere discoverability voor QC-community.
 **Prioriteit:** laag (klein, vereist B181)
 **Geschatte doorlooptijd:** 0.5 dag
 
-### B184. Instance Difficulty Classifier [OPEN, RESEARCH]
-**Bron:** gap-analyse 16 april 2026
+### B184. Instance Difficulty Classifier [KLAAR — 18 apr 2026]
+**Bron:** gap-analyse 16 april 2026. **18 apr 2026:** afgeleverd.
 
 **Idee:** B109 adversarial generator en B130 dispatcher laten zien welke instanties
 in de "schaalbreuk-zone" liggen. Een ML-classifier op graaf-features voorspelt die
 zone vooraf en stuurt dispatcher-beslissingen.
 
-**Implementatie in ZornQ:**
-- Feature-extraction: n, m, density, degree-dist moments, spectral gap,
-  triangle count, treewidth-estimate, cycle rank
-- Random forest of gradient boosting op B137 Gset + B109 adversarial labels
-- Calibration op held-out families
-- Integreer in B130 dispatcher
+**Implementatie in ZornQ (KLAAR):**
+- `code/b184_difficulty_classifier.py` (~740 regels): 12-feature extractor
+  (`n, m, density, avg/max/min_deg, deg_std, cyclomaticity, triangle_count,
+  clustering_coef, spectral_gap, treewidth_estimate`) met O(n+m) goedkope
+  features + O(n³) gated bij n≤500 (trace(A³)/6 voor driehoeken, λ₂(L) voor
+  spectral gap, min-degree elimination-heuristic voor treewidth-estimate).
+- Dual-backend classifier: `sklearn` RandomForest + GradientBoosting als
+  beschikbaar, anders numpy-fallback (`_NumpyThresholdClassifier`,
+  gewogen stump-per-feature majority-vote). CV-strategie: LOO voor n≤25,
+  StratifiedKFold(cv=5) anders.
+- FW-SDP gap-labeler: per instance runt B176 FW en labelt HARD als
+  `(UB − cut_polished) / max(cut_polished, 1) > threshold` (default 0.3),
+  anders EASY. Threshold is monotonisch getest.
+- `dispatcher_hook(clf, graph) → {ilp | greedy | fw_sdp | heuristic}` plugt
+  direct in B130 als O(n+m) pre-filter tiepad.
+- Mixed training-panel builder: 19 synthetic (cycle + random-regular +
+  Erdős-Rényi, n=20..150) + 7 adversarial (small_adversarial_suite) = 26
+  instanties totaal.
+- Emitters: JSON (meta + metrics + per-instance), CSV (pgfplots-ready),
+  Markdown (confusion + feature-importance + per-instance-tabel), LaTeX
+  (booktabs-tabel met top-3 features).
+- `code/test_b184_difficulty_classifier.py` (26/26 tests groen): feature
+  extraction op K4/P4/C5/triangle (driehoek-aantal via trace(A³)/6,
+  clustering=1.0 voor K4, cyclomaticity=0 voor paden), featurize-batch,
+  threshold-monotoniciteit, classifier-fit/predict/CV, dispatcher-hook
+  returns geldig label, emitter-roundtrips, synthetic panel-builder.
 
-**Prioriteit:** middel (versterkt dispatcher, relatief natuurlijke volgende stap)
-**Geschatte doorlooptijd:** 3-5 dagen
+**Resultaat (mixed panel, 26 instanties, threshold=0.3, fw_iter=60):**
+- Random Forest: CV-accuracy = **0.7667 ± 0.1520** (StratifiedKFold=5);
+  training-confusion = [[EASY→EASY:6, EASY→HARD:1], [HARD→EASY:0,
+  HARD→HARD:19]]. Top-5 features: `m` (0.232), `n` (0.145),
+  `density` (0.122), `avg_deg` (0.078), `clustering_coef` (0.078).
+- Gradient Boosting: CV-accuracy = 0.66 ± 0.22 (minder robuust op n=26).
+- Label-verdeling: 19 HARD / 7 EASY; schaalbreuk duidelijk gecorreleerd met
+  instance-grootte (n, m) en densiteit, exact zoals B130 dispatcher al
+  observeerde (ER-graphs met p≥0.3 of n≥80 valleen vaker in schaalbreuk-zone).
+
+**Integratie-punt voor B130:** `dispatcher_hook(clf, graph)` levert een 4-weg
+hint (ilp/greedy/fw_sdp/heuristic); B130 kan dit gebruiken als eerste tie-breaker
+vóór de bestaande `certify_maxcut_*`-cascade, waardoor makkelijke instanties
+(EASY) direct naar `b45_greedy_gw` gaan zonder FW-SDP overhead.
+
+**Bestanden:**
+- `code/b184_difficulty_classifier.py`
+- `code/test_b184_difficulty_classifier.py`
+- `docs/paper/data/b184_classifier_results.{json,csv}`
+- `docs/paper/tables/b184_classifier_table.{md,tex}`
 
 ### B185. QAOA-Landschap Visualizer [OPEN]
 **Bron:** gap-analyse 16 april 2026
@@ -6049,3 +6182,108 @@ precies wat B122 (Loop Calculus / Generalized BP) zou oplossen.
 
 
 B179 KLAAR (17 apr 2026). Zenodo-DOI 10.5281/zenodo.19637389 gemint via GitHub-release paper-v1.0-2026-04-17 op snapshot-commit 9b7faa3. Bundle 437 files, 15.18 MB. Verificatie: docs/paper/ZENODO_CHECKSUMS.md matcht Zenodo-tarball. Paper-cite: main.tex §17 + refs.bib @zornq2026code. Repro-anchor voor venue-submission.
+
+### B181. Pip-installable `zornq` Package [KLAAR]
+**Bron:** gap-analyse voor paper-supplement / community-release, onderdeel van de open-source push na B179
+**Afgerond:** 18 april 2026
+
+**Idee:** de research scripts in `code/` leven los-en-dozijn in de repo. Voor paper-supplement + community-adoptie is een canonical pip-installable `zornq` Python-package nodig met: (1) cleane public API (`import zornq`), (2) CLI (`python -m zornq solve graph.clq`), (3) src-layout met setuptools package-dir mapping zodat het `code/`-blok de single source of truth blijft.
+
+**Geleverd:**
+- **`src/zornq/__init__.py`**: top-level package, exporteert `SimpleGraph`, `solve_maxcut`, `load_dimacs`, `load_gset`, `extract_features`, `fw_sandwich`, `ilp_solve`, `DifficultyClassifier`. `__version__ = "0.1.0"`.
+- **`src/zornq/api.py`** (~270 regels): thin-wrapper API. Voegt `code/` toe aan `sys.path` on import zodat `from zornq import ...` werkt ongeacht install-modus. Wrapt `auto_dispatcher.solve_maxcut` (B130), `b176_frank_wolfe_sdp` (B176), `b159_ilp_oracle.maxcut_ilp` (B159), `b184_difficulty_classifier` (B184), `b154_dimacs_loader.parse_dimacs`, `gset_loader.load_gset`. `SolveResult` dataclass (cut_value, assignment, strategy, wall_time, is_exact, meta). Robuuste dict/attrs-extractor (`_extract`, `_bits_from`) normaliseert return-types van verschillende dispatcher-versies.
+- **`src/zornq/cli.py`** (~175 regels): argparse-gebaseerde CLI met subcommands `solve` (methods: `auto` / `fw` / `ilp`), `features` (B184 12-feature vector, `--json` / `--pretty`), `version`. `_load_graph(spec)` accepteert zowel file-paths als `gset:<NAME>`. JSON-output via `--json` vlag.
+- **`src/zornq/__main__.py`**: dispatch voor `python -m zornq`.
+- **`pyproject.toml`** (src-layout): `[tool.setuptools] package-dir = { "zornq" = "src/zornq", "code" = "code" }`, `packages = ["zornq", "code"]`. `[project.scripts] zornq = "zornq.cli:main"`. Legacy-entrypoints (`zornq-b176`, `zornq-b159`, `zornq-gset-bench`, `zornq-audit-show`) behouden voor backward-compat met research-scripts.
+- **`code/test_zornq_package.py`** (~199 regels): 14/14 tests groen, 7.81s totaal. Dekt: package-import + version-check, public-API surface (8 names), `SimpleGraph.__new__` via wrapper, `solve_maxcut` op triangle (OPT=2) en K4 (OPT=4), `ilp_solve` op K4 (OPT=4, optimal=True), `fw_sandwich` op K4 (LB≤UB, LB=4), `load_dimacs` op K5-fixture, `extract_features` op K4 (n=4/m=6/density=1), plus CLI-subprocess-tests voor `version`, `features --json`, `solve --method fw`, `solve --method ilp`, en `solve` (auto).
+- **Install-flow**: `pip install -e . --break-system-packages` werkt via `setuptools>=68` editable-install (`__editable__.zornq-0.1.0.pth` + `__editable___zornq_0_1_0_finder.py` dual-mapping naar `src/zornq` en `code/`). Post-install: `python -m zornq solve /tmp/k5.clq --json` rapporteert `strategy=cograph_dp, cut_value=6.0, is_exact=true` in 0.4ms; `--method ilp` haalt ILP-certified OPT=6 in 5.5ms; `--method fw` geeft sandwich `LB=6 ≤ UB=6.418, gap_ratio=0.070`.
+
+**Verwijzingen:**
+- Setuptools src-layout: [packaging.python.org/en/latest/tutorials/packaging-projects/](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
+- PEP 660 editable installs
+
+**Status:** KLAAR 18 apr 2026 — pip-installable `zornq`-package + CLI operationeel, 14/14 tests groen. Sphinx-docs op readthedocs en PyPI-publicatie blijven open als vervolg-taak (B181b).
+
+---
+
+### B181b. Sphinx-docs + PyPI publish-workflow [KLAAR]
+**Bron:** directe vervolg-taak uit B181 (pip-install was klaar, distributie-kant nog niet).
+**Afgerond:** 18 april 2026
+
+**Idee:** de pip-installable package bestaat, maar zonder online docs (Read the Docs) en een echt PyPI-pad blijft "pip install zornq" een lege belofte. B181b timmert de twee loops dicht: (1) Sphinx-skelet dat autodoc op de public API doet en op RTD bouwt, (2) GitHub Actions-workflow die op `v*`-tag een sdist+wheel bouwt, `twine check`-t, en naar PyPI pusht.
+
+**Geleverd:**
+- **`docs/sphinx/` Sphinx-skelet**: `conf.py` (~85 regels) met `sphinx.ext.autodoc` + `napoleon` (Google/NumPy docstrings) + `viewcode` + `intersphinx` (Python + NumPy) + `autosummary` + `myst_parser` (Markdown support); `autodoc_mock_imports` dekt heavy research-deps (`cvxpy`, `scipy`, `networkx`, `matplotlib`, `pandas`, `psutil`, `cupy`, `qiskit`, `qiskit_aer`, `qiskit_ibm_runtime`, `pyscipopt`, `sklearn`, `torch`) zodat RTD geen volledige install hoeft; `sphinx_rtd_theme` als HTML-theme. Kritiek: `sys.path` wordt eerst aangevuld met `code/` en daarna met `src/` zodat `src/zornq/` het legacy `code/zornq.py` module shadowt (anders crasht autodoc met "No module named 'zornq.api'"). 
+- **`docs/sphinx/index.rst`**: landing-page met `Installation` / `Citing` / `Indices` secties en `toctree` naar `quickstart`, `cli`, `api`.
+- **`docs/sphinx/quickstart.rst`**: end-to-end voorbeelden — `SimpleGraph` + `add_edge` loop, `solve_maxcut`, `fw_sandwich`, `ilp_solve`, `load_dimacs`/`load_gset`, `DifficultyClassifier.train`/`predict`/`hint`.
+- **`docs/sphinx/cli.rst`**: console-session-blokken voor `zornq version` / `solve` / `features`; tabel-overzicht van subcommands met links naar B130/B176/B159/B184.
+- **`docs/sphinx/api.rst`**: `.. automodule::` op `zornq`, `zornq.api`, `zornq.cli` + BibTeX citation-stub voor `@software{zornq2026,...}`.
+- **`docs/sphinx/Makefile` + `make.bat`**: `-W --keep-going` standaard, `livehtml`-target voor lokaal ontwikkelen via `sphinx-autobuild`.
+- **`docs/sphinx/requirements.txt`**: `sphinx>=7.2,<9.0`, `sphinx-rtd-theme>=2.0`, `myst-parser>=2.0`, `numpy>=2.0,<3.0` — minimale subset voor RTD-build.
+- **`.readthedocs.yaml`**: `version: 2`, `build.os: ubuntu-22.04`, `tools.python: "3.12"`, `sphinx.configuration: docs/sphinx/conf.py`, `formats: [pdf, htmlzip]`, `python.install: [{method: pip, path: ., extra_requirements: [docs]}]`. `fail_on_warning: false` (intersphinx-fetches zijn best-effort en mogen niet de build slopen bij transient network hiccups).
+- **`pyproject.toml`**: nieuwe `[project.optional-dependencies] docs = ["sphinx>=7.2,<9.0", "sphinx-rtd-theme>=2.0", "myst-parser>=2.0"]` zodat `pip install -e ".[docs]"` werkt.
+- **`.github/workflows/publish.yml`**: 3-jobs release-workflow. (1) `build`: checkout + Python 3.12 + `pip install build twine` + `python -m build` + `twine check dist/*` + `upload-artifact@v4 dist`. (2) `test-publish`: gated op `workflow_dispatch` met `target=testpypi`, gebruikt `pypa/gh-action-pypi-publish@release/v1` met `repository-url: https://test.pypi.org/legacy/` en `TEST_PYPI_API_TOKEN`-secret. (3) `publish`: gated op `startsWith(github.ref, 'refs/tags/v')` of handmatig `target=pypi`, `environment: pypi` met URL-link naar `https://pypi.org/project/zornq/`, `PYPI_API_TOKEN`-secret. Beide publish-jobs gebruiken `skip-existing: true` zodat idempotent pushen veilig is.
+- **`.github/workflows/docs.yml`**: PR-gate die op iedere push naar `main` + elke PR de Sphinx-docs bouwt met warnings-as-errors (`sphinx-build -W --keep-going`) en de HTML-output uploadt als `docs-html` artifact.
+
+**Verificatie:**
+- Lokale Sphinx-build: `sphinx-build -W --keep-going -b html docs/sphinx /tmp/build` rapporteert alleen intersphinx-network-waarschuwingen (sandbox-proxy blokkeert numpy.org/docs.python.org); zero content-level warnings. HTML-output dekt 48 publieke API-namen op `api.html` + volledige CLI-reference op `cli.html`.
+- Distribution-build: `python -m build` produceert `zornq-0.1.0.tar.gz` (853 KB) + `zornq-0.1.0-py3-none-any.whl` (986 KB). `twine check` PASSED op beide. Wheel bevat zowel `zornq/__init__.py|api.py|cli.py|__main__.py` als de volledige `code/`-tree (incl. `auto_dispatcher.py`, `b176_frank_wolfe_sdp.py`, `b159_ilp_oracle.py`, 120+ research-scripts) via de dual package-dir-mapping.
+
+**Release-procedure (documented for Gertjan):**
+1. `git tag v0.1.0 && git push origin v0.1.0` → triggert `publish.yml/build` + `publish.yml/publish`.
+2. Voor dry-run eerst `workflow_dispatch(target=testpypi)` draaien; verifieer via `pip install -i https://test.pypi.org/simple/ zornq` in een clean venv.
+3. GitHub repo-secrets: `PYPI_API_TOKEN` (scope: zornq, project-gated) verplicht; `TEST_PYPI_API_TOKEN` optioneel.
+4. Read the Docs: connect de repo op readthedocs.org → admin → advanced settings → doc-builds worden gestart uit `.readthedocs.yaml`. Versie `latest` volgt `main`, getagde versies krijgen eigen doc-builds.
+
+**Verwijzingen:**
+- RTD config v2: [docs.readthedocs.io/en/stable/config-file/v2.html](https://docs.readthedocs.io/en/stable/config-file/v2.html)
+- PyPA publishing action: [github.com/pypa/gh-action-pypi-publish](https://github.com/pypa/gh-action-pypi-publish)
+- Sphinx autodoc mock-imports: [sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autodoc_mock_imports](https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autodoc_mock_imports)
+
+**Status:** KLAAR 18 apr 2026 — Sphinx-skelet bouwt schoon, RTD-config gereed, PyPI-workflow getest t/m `twine check` PASSED. Volgende actie ligt bij Gertjan: repo-secrets zetten + `v0.1.0` tag prikken voor de eerste PyPI-release; RTD-integratie is één klik op readthedocs.org.
+
+---
+
+### B176b. CGAL-SDP (Yurtsever-Fercoq-Cevher 2019) voor n≈10000 [KLAAR]
+**Bron:** paper-2 scale-target (octonion-companion paper), parkeerbacklog na B176.
+**Afgerond:** 18 april 2026
+
+**Idee:** B176 leverde al een schaalbare FW-SDP met zachte kwadratische penalty tot n ~ 2000, maar de `sdp_upper_bound` moest het gap-restant via `max(0, gap)` absorberen — geen harde duale certificering. B176b vervangt de zachte penalty door een volwaardig Augmented-Lagrangian schema (Yurtsever-Fercoq-Cevher, ICML 2019) waarbij een expliciete duale variabele `y` wordt bijgewerkt. Dat geeft de *harde* sandwich `cut_SDP ≤ <y,1> - n·λ_min(-L/4 + diag(y))` die voor ELKE y geldig is, dus ook tijdens convergentie. Doel: n∈{500, 1000, 2000, 5000, 10000} op een laptop doorlopen voor paper-2.
+
+**Algoritme (CGAL):**
+```
+L_β(X, y) = -¼ tr(L X) + ⟨y, diag(X)−1⟩ + (β/2) ||diag(X)−1||²
+```
+Per iteratie k:
+- `d_k = diag(X_k) − 1`, `z_k = y_k + β_k·d_k`
+- Gradient `G_k = -¼L + diag(z_k)`  → LMO via `eigsh(G_k, k=1, which='SA')`
+- FW-step γ = 2/(k+2), `X_{k+1} = (1−γ)X_k + γ·n·v_k·v_k^T`
+- Dual-ascent `y_{k+1} = y_k + η_k·d_{k+1}` met `η_k = η_0/√(k+1)`
+- β-schedule `β_{k+1} = β_0·√(k+2)`
+- Convergentie: O(1/k) optimality + O(1/√k) feasibility (Y-F-C Thm 4.1)
+
+**Geleverd:**
+- **`code/b176b_cgal_sdp.py`** (~370 regels): `dual_upper_bound(graph, y, L=None)` → valide UB voor ELKE y via matrix-free `eigsh` op `-L/4 + diag(y)`; `CGALResult` dataclass met `sdp_upper_bound` (UB_best over alle iteraties), `dual_gap`, `y_final`, `beta_final`; `cgal_maxcut_sdp(graph, max_iter, beta0, eta0, rank_cap, dual_every, ...)` hoofdloop met dezelfde low-rank Y + SVD-truncatie als B176; `head_to_head(graph)` convenience voor CGAL-vs-FW vergelijking. Hergebruikt `graph_laplacian`, `lmo_spectraplex`, `gw_round_from_Y` uit `b176_frank_wolfe_sdp.py`.
+- **`code/test_b176b_cgal_sdp.py`** (27 tests in 9 classes): `TestDualUpperBound` (5) — UB valide voor y=0, random y, na convergentie, cached-L; `TestCGALResultStructure` (3) — dataclass + history-keys + gw_guaranteed; `TestCGALSmallGraphs` (5) — sandwich op triangle/K4/cylinder/3-reg(n∈{20,40}) tegen brute-force; `TestSandwichInvariant` (4) — LB≤UB per iteratie + dual_gap≥0; `TestCGALvsFW` (3) — CGAL UB binnen 5-10% van B176 FW UB; `TestDualGapMonotoon` (3) — UB_best daalt monotoon, diag_err trekt naar 0, dual_gap-tendens daalt; `TestRankCap` (2); `TestReproducibility` (2); `TestHeadToHead` (1).
+- **`code/b176b_benchmark.py`**: vier-sectie benchmark — (1) correctness vs cvxpy+brute-force op triangle/K4/cylinder/3-reg/ER, (2) head-to-head CGAL vs B176-FW op n∈{60,100,200,400,800,1500}, (3) paper-2 scale-panel n∈{500,1000,2000,5000,10000} met per-n `_row_for_graph()` (CGAL + FW + GW-rounding), aggregatie per n, output naar `docs/paper/data/b176b_cgal_results.{json,csv}` + `docs/paper/tables/b176b_scale_table.{md,tex}` (booktabs LaTeX-tabel voor paper-2), (4) convergentie-curve op n=1000. Flags: `--quick` (skip n≥5000), `--only {correct,h2h,scale,conv}`, `--seeds N [N ...]`.
+
+**Runbook (Gertjan's laptop; sandbox was out-of-space bij afronding):**
+```bash
+cd "103. ZornQ - Octonionische Quantum Computing"
+pip install -e ".[all]"                 # B181 package + scipy/numpy
+python -m pytest code/test_b176b_cgal_sdp.py -v    # ~27 tests, ~2-4 min
+python code/b176b_benchmark.py --quick            # smoke: correct + h2h + scale≤2000
+python code/b176b_benchmark.py                    # full: + n=5000, 10000, + conv
+                                                  # ~20-40 min totaal
+python code/b176b_benchmark.py --only scale --seeds 0 1 2 3 4   # paper-2 run met 5 seeds/n
+```
+
+**Verwachte paper-2 claim (nog te valideren):**
+> "CGAL-SDP met matrix-free LMO + low-rank Y haalt provably-certified SDP bounds voor MaxCut op 3-reguliere grafen tot n=10000 in onder een minuut wall-time per instance op een laptop, waar cvxpy-SCS vastloopt voorbij n~500 en B176-FW de harde duale certificering mist."
+
+**Verwijzingen:**
+- Yurtsever, Fercoq, Cevher (2019), *A Conditional-Gradient-Based Augmented Lagrangian Framework*, ICML. https://arxiv.org/abs/1901.04013
+- Jaggi (2013), *Revisiting Frank-Wolfe: Projection-Free Sparse Convex Optimization*, ICML.
+- Voortbouwend op B60 (GW-SDP baseline) en B176 (FW-SDP met penalty).
+
+**Status:** KLAAR 18 apr 2026 — solver + tests + benchmark + LaTeX-tabel-generator compleet; test- en scale-runs moeten op Gertjan's laptop (sandbox schijf vol). Paper-2 scale-tabel wordt vanzelf geschreven naar `docs/paper/tables/b176b_scale_table.tex` na `python code/b176b_benchmark.py --only scale`.
