@@ -507,7 +507,7 @@ loose on this instance (see \cref{sec:discussion}).
     \bottomrule
   \end{tabular}
   \caption{Unified benchmark panel (post B159-Dag-8b). \textbf{cert}: \textsc{E}xact
-    \ILP-certificate or \textsc{A}pproximate (sandwich \LB/\UB).
+    \ILP-certificate or \textsc{A}pproximate (sandwich $\LB$/$\UB$).
     $\UB_{\FW}, \LB_{\FW}$: Frank--Wolfe sandwich bounds on the
     unsigned $|w|$-Laplacian (\cref{sec:fwsdp}).
     \textbf{Auto}: dispatcher-selected strategy. $\ddagger$: on signed
@@ -748,10 +748,13 @@ presenting the \ZornQ octonionic simulator layer independently of the
 \section*{Data and code availability}
 
 All code, pinned container specification, raw JSON/CSV artefacts,
-LaTeX sources, and figure-generation pipelines are distributed with
-this manuscript in the companion repository. The \textsc{ibm\_kingston}
-job-bundles (\texttt{job\_id}, counts, and $(\gamma, \beta)$
-parameters) are included in \texttt{docs/paper/hardware/jobs/}.
+LaTeX sources, and figure-generation pipelines are publicly
+distributed via Zenodo~\cite{zornq2026code} (DOI
+\href{https://doi.org/10.5281/zenodo.19637389}{10.5281/zenodo.19637389})
+and its GitHub mirror tagged \texttt{paper-v1.0-2026-04-17}. The
+\textsc{ibm\_kingston} job-bundles (\texttt{job\_id}, counts, and
+$(\gamma, \beta)$ parameters) are included in
+\texttt{docs/paper/hardware/jobs/}.
 
 % ===================================================================
 \printbibliography

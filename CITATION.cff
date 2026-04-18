@@ -8,9 +8,9 @@ authors:
 version: 1.0.0
 date-released: 2026-04-17
 license: MIT
-doi: "10.5281/zenodo.FILL-IN-AFTER-MINT"
-url: "https://github.com/FILL-IN/zornq"
-repository-code: "https://github.com/FILL-IN/zornq"
+doi: "10.5281/zenodo.19637389"
+url: "https://github.com/gertjanbron/zornq"
+repository-code: "https://github.com/gertjanbron/zornq"
 preferred-citation:
   type: software
   title: "ZornQ: Anytime MaxCut with Sandwich Certificates and Real-Hardware QAOA Validation"
@@ -18,4 +18,4 @@ preferred-citation:
     - family-names: Bron
       given-names: Gertjan
   year: 2026
-  doi: "10.5281/zenodo.FILL-IN-AFTER-MINT"
+  doi: "10.5281/zenodo.19637389"
