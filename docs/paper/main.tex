@@ -695,11 +695,13 @@ multi-$p$ study to future work.
 \paragraph{FW sandwich on signed instances.} The Frank-Wolfe module operates on the unsigned $|w|$-Laplacian. On graph problems with negative edge weights, this means that while $\UB_{\FW}$ continues to bound signed $\OPT$ efficiently, the feasible primal bound $\LB_{\FW}$ only guarantees a bound for the unsigned MaxCut, which can exceed the signed MaxCut optimum. This violation of the sandwich invariant ($\LB_{\FW} > \OPT$) is evident on three BiqMac instances in \cref{tab:selector}; a sign-aware FW backend that directly optimizes the signed Laplacian is a required next step for full certification of frustrated inputs.
 \end{sloppypar}
 
+\begin{sloppypar}
 \paragraph{Cograph-only exact path.} The twin-width dispatcher's
 \emph{exact} exit today is cograph-DP ($\tww = 0$). The natural
 extension is a bounded-twin-width dynamic program for
 $\tww \in \{1, \ldots, 5\}$~\cite{schidler2022sat,bonnet2022twin};
 this is a research-level item and we do not claim it here.
+\end{sloppypar}
 
 \paragraph{Octonionic layer.} The name \ZornQ reflects the project's
 exploratory interest in Zorn split-octonion representations and
@@ -730,15 +732,17 @@ repository provides:
   \item A test suite with $\gtrsim 500$ tests that passes on the pinned
         container in under two minutes.
 \end{itemize}
+\begin{sloppypar}
 The \textsc{ibm\_kingston} hardware run of \cref{sec:hardware} was
 executed from the author's personal laptop using a token held
 \emph{outside} the project directory (via the \texttt{QISKIT\_IBM\_TOKEN}
 environment variable); no credentials are stored in the repository.
-Results are persisted to \texttt{docs/paper/hardware/jobs/<job\_id>.json}
-and are replayable via \texttt{--resume <job\_id>}. We follow the spirit
+Results are persisted to \texttt{docs/paper/hardware/jobs/\textless{}job\_id\textgreater{}.json}
+and are replayable via \texttt{-{}-resume \textless{}job\_id\textgreater{}}. We follow the spirit
 of pre-registered reproducibility~\cite{ioannidis2005why}: every figure
 and table in the paper is generated from a deterministic pipeline whose
 input is a pinned configuration file.
+\end{sloppypar}
 
 % ===================================================================
 \section{Conclusion}
