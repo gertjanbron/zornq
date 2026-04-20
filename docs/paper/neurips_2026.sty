@@ -1,0 +1,20 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{neurips_2026}[2026/04/20 NeurIPS 2026 style (Mocked for compilation)]
+
+% Declare options
+\DeclareOption{final}{\typeout{NeurIPS 2026 final version}}
+\DeclareOption{preprint}{\typeout{NeurIPS 2026 preprint version}}
+\DeclareOption{nonatbib}{\typeout{NeurIPS 2026 not loading natbib}}
+\DeclareOption{anonymous}{\typeout{NeurIPS 2026 anonymous version}}
+\ProcessOptions\relax
+
+% NeurIPS page dimensions
+\RequirePackage[
+  letterpaper,
+  textwidth=5.5in,
+  textheight=9in,
+  marginparsep=0.25in,
+  marginparwidth=1in
+]{geometry}
+
+\endinput
