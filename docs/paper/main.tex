@@ -264,7 +264,9 @@ output to one of four levels: \textsc{Exact} (\ILP-certified $\OPT$),
     
     \QAOA (Aer / runtime) & Quantum LB, hw-matched & Heuristic   & $n \lesssim 30$ (sim), $n \le 127$ (hw) \\
     \bottomrule
-  \end{tabular}}
+  \end{tabular}%
+}% 
+}}
   \caption{Core pipeline components, their role in the sandwich, and the
     instance sizes for which each remains tractable on a single workstation.}
   \label{tab:components}
@@ -389,7 +391,8 @@ loose on this instance (see \cref{sec:discussion}).
 
 \begin{table}[t]
   \centering\small
-  \begin{tabular}{lllrrrrrrrr}
+  \resizebox{\linewidth}{!}{%
+\begin{tabular}{lllrrrrrrrr}
     \toprule
     \textbf{Dataset} & \textbf{Instance} & & $n$ & $m$
       & $\OPT$ & \textbf{cert} & $\UB_{\FW}$ & $\LB_{\FW}$
@@ -412,7 +415,8 @@ loose on this instance (see \cref{sec:discussion}).
     DIMACS & c6                  & &  6 &  6 &  6.0 & E &  6.00 &  6.00 & exact\_small           & E\\
     DIMACS & queen5\_5           & &  6 &  9 &  7.0 & E &  7.17 &  6.98 & exact\_small           & E\\
     \bottomrule
-  \end{tabular}
+  \end{tabular}% 
+}
   \caption{Unified benchmark panel (post B159-Dag-8b). \textbf{cert}: \textsc{E}xact
     \ILP-certificate or \textsc{A}pproximate (sandwich $\LB$/$\UB$).
     $\UB_{\FW}, \LB_{\FW}$: Frank--Wolfe sandwich bounds on the
@@ -506,16 +510,18 @@ presenting the \ZornQ octonionic simulator layer independently of the
 % ===================================================================
 \section*{Data and code availability}
 
-All code, pinned container specification, raw JSON/CSV artefacts,
-LaTeX sources, and figure-generation pipelines are publicly
+\begin{sloppypar}
 All code, pinned container specification, raw JSON/CSV artefacts,
 LaTeX sources, and figure-generation pipelines are publicly
 distributed via an anonymized code repository at
 \url{https://anonymous.4open.science/r/zornq-anon-PLACEHOLDER}
 (to be de-anonymized upon acceptance). A Zenodo DOI will be
 provided in the camera-ready version~\cite{zornq2026code}.
+\end{sloppypar}
+
 % ===================================================================
 \section*{Broader Impact}
+\label{sec:broader_impact}
 Our work advances reproducible combinatorial optimization by pairing
 classical and quantum-inspired solvers with provable sandwich
 certificates. Positive impacts: open-source availability (Apache-2.0),
