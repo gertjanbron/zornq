@@ -8,22 +8,44 @@
 \item {\bf Claims}
     \item[] Question: Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: See paper content for details.
+    \item[] Justification: The abstract and the ``Contributions'' paragraph of
+        \cref{sec:introduction} enumerate five concrete deliverables: (i) a
+        laptop-scale \MaxCut dispatcher; (ii) a matrix-free Frank--Wolfe
+        sandwich \SDP; (iii) dual lower/upper-bound certificates; (iv) paired
+        noiseless-Aer / calibration-mirror \QAOA hardware validation on
+        \textsc{ibm\_kingston}; and (v) a deterministic seed-ledger pipeline.
+        Each claim is backed by a dedicated experimental section
+        (\cref{sec:selector,sec:hardware} in the main paper and
+        \cref{sec:anytime,sec:leaderboard} in the supplementary material),
+        and the headline measured values (approximation ratios $0.776$ and
+        $0.773$; calibration-mirror error $1.6$--$2.9\%$) appear verbatim
+        in the abstract.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the abstract and introduction do not include the claims made in the paper.
-        \item The abstract and/or introduction should clearly state the claims made, including the contributions made in the paper and important assumptions and limitations. A \answerNo{} or \answerNA{} answer to this question will not be perceived well by the reviewers. 
-        \item The claims made should match theoretical and experimental results, and reflect how much the results can be expected to generalize to other settings. 
-        \item It is fine to include aspirational goals as motivation as long as it is clear that these goals are not attained by the paper. 
+        \item The abstract and/or introduction should clearly state the claims made, including the contributions made in the paper and important assumptions and limitations. A \answerNo{} or \answerNA{} answer to this question will not be perceived well by the reviewers.
+        \item The claims made should match theoretical and experimental results, and reflect how much the results can be expected to generalize to other settings.
+        \item It is fine to include aspirational goals as motivation as long as it is clear that these goals are not attained by the paper.
     \end{itemize}
 
 \item {\bf Limitations}
     \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: §Abstract, §Selector, §Hardware tables are exact.
+    \item[] Justification: The paper contains a dedicated section
+        ``Discussion and limitations'' (main paper, immediately after
+        \cref{sec:hardware}) with five paragraphs covering
+        (i) BiqMac signed spin-glass instances and the failure of the
+        unsigned sandwich on them, (ii) the \QAOA $p{=}1$ approximation-ratio
+        ceiling on both hardware instances, (iii) the behaviour of the
+        Frank--Wolfe sandwich on signed weights, (iv) the cograph-only
+        scope of the exact dispatcher branch, and (v) the speculative
+        status of the octonionic layer. Strong assumptions (unsigned
+        weights on the sandwich path, GTX\,1650-class GPU and 16\,GB RAM
+        commodity target, Qiskit-Runtime token required for the hardware
+        replay) are called out explicitly.
     \item[] Guidelines:
     \begin{itemize}
-        \item The answer \answerNA{} means that the paper has no limitation while the answer \answerNo{} means that the paper has limitations, but those are not discussed in the paper. 
+        \item The answer \answerNA{} means that the paper has no limitation while the answer \answerNo{} means that the paper has limitations, but those are not discussed in the paper.
         \item The authors are encouraged to create a separate ``Limitations'' section in their paper.
         \item The paper should point out any strong assumptions and how robust the results are to violations of these assumptions (e.g., independence assumptions, noiseless settings, model well-specification, asymptotic approximations only holding locally). The authors should reflect on how these assumptions might be violated in practice and what the implications would be.
         \item The authors should reflect on the scope of the claims made, e.g., if the approach was only tested on a few datasets or with a few runs. In general, empirical results often depend on implicit assumptions, which should be articulated.
@@ -35,27 +57,48 @@
 
 \item {\bf Theory assumptions and proofs}
     \item[] Question: For each theoretical result, does the paper provide the full set of assumptions and a complete (and correct) proof?
-    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: §Discussion paragraphs on signed FW, p=1 ceiling, cograph-only.
+    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The paper's contributions are algorithmic and
+        empirical; there are no numbered theorem, lemma, or proposition
+        blocks in the main text or supplement. The sandwich certificate
+        properties invoked in \cref{sec:fwsdp} (Frank--Wolfe convergence
+        and weak duality of the dual upper bound) are cited from the
+        published
+        literature~\cite{jaggi2013revisiting,hazan2008sparse,yurtsever2021scalable}
+        rather than re-derived, and every quantitative bound reported in
+        the paper is either measured empirically or referenced to its
+        originating theorem in the cited source.
     \item[] Guidelines:
     \begin{itemize}
-        \item The answer \answerNA{} means that the paper does not include theoretical results. 
+        \item The answer \answerNA{} means that the paper does not include theoretical results.
         \item All the theorems, formulas, and proofs in the paper should be numbered and cross-referenced.
         \item All assumptions should be clearly stated or referenced in the statement of any theorems.
-        \item The proofs can either appear in the main paper or the supplemental material, but if they appear in the supplemental material, the authors are encouraged to provide a short proof sketch to provide intuition. 
+        \item The proofs can either appear in the main paper or the supplemental material, but if they appear in the supplemental material, the authors are encouraged to provide a short proof sketch to provide intuition.
         \item Inversely, any informal proof provided in the core of the paper should be complemented by formal proofs provided in appendix or supplemental material.
-        \item Theorems and Lemmas that the proof relies upon should be properly referenced. 
+        \item Theorems and Lemmas that the proof relies upon should be properly referenced.
     \end{itemize}
 
     \item {\bf Experimental result reproducibility}
     \item[] Question: Does the paper fully disclose all the information needed to reproduce the main experimental results of the paper to the extent that it affects the main claims and/or conclusions of the paper (regardless of whether the code and data are provided or not)?
     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: §FW-SDP eq:fw-objective + §SDP-scaling weak duality.
+    \item[] Justification: The supplementary \cref{sec:repro} gives a
+        full reproducibility specification: a pinned \texttt{requirements.txt}
+        and \texttt{pyproject.toml} (seven core dependencies plus five
+        optional dependency groups); a \texttt{Dockerfile} and
+        \texttt{environment.yml} that pin to Python 3.12-slim and set
+        \texttt{PYTHONHASHSEED=0}; a deterministic seed-ledger module
+        that derives per-run child seeds via SHA-256 from a root seed and
+        supports bit-identical replay after save/load; and a test suite
+        with ${\gtrsim}500$ tests that passes on the pinned container in
+        under two minutes. Every figure and table in the paper is
+        produced from a deterministic pipeline whose input is a pinned
+        configuration file, and hardware-job results are persisted to
+        JSON files replayable via \texttt{-{}-resume}.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper does not include experiments.
         \item If the paper includes experiments, a \answerNo{} answer to this question will not be perceived well by the reviewers: Making the paper reproducible is important, regardless of whether the code and data are provided or not.
-        \item If the contribution is a dataset and\slash or model, the authors should describe the steps taken to make their results reproducible or verifiable. 
+        \item If the contribution is a dataset and\slash or model, the authors should describe the steps taken to make their results reproducible or verifiable.
         \item Depending on the contribution, reproducibility can be accomplished in various ways. For example, if the contribution is a novel architecture, describing the architecture fully might suffice, or if the contribution is a specific model and empirical evaluation, it may be necessary to either make it possible for others to replicate the model with the same dataset, or provide access to the model. In general. releasing code and data is often one good way to accomplish this, but reproducibility can also be provided via detailed instructions for how to replicate the results, access to a hosted model (e.g., in the case of a large language model), releasing of a model checkpoint, or other means that are appropriate to the research performed.
         \item While NeurIPS does not require releasing code, the conference does require all submissions to provide some reasonable avenue for reproducibility, which may depend on the nature of the contribution. For example
         \begin{enumerate}
@@ -70,7 +113,18 @@
 \item {\bf Open access to data and code}
     \item[] Question: Does the paper provide open access to the data and code, with sufficient instructions to faithfully reproduce the main experimental results, as described in supplemental material?
     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: Docker, seed-ledger, anon repo.
+    \item[] Justification: The ``Data and code availability'' section of
+        the main paper points to an anonymised review-time mirror at
+        \url{anonymous.4open.science} containing all code, the pinned
+        container specification, raw \texttt{JSON}/\texttt{CSV} experiment
+        artefacts, \LaTeX{} sources, and the figure-generation
+        pipelines; a Zenodo DOI will be supplied in the camera-ready
+        version. Exact commands needed to reproduce every headline number
+        (anytime curve, leaderboard table, hardware replay) are
+        documented in the companion repository's \texttt{README} and
+        supplementary \cref{sec:repro}. Benchmark instances (Gset, BiqMac,
+        DIMACS) are cited at first use and can be obtained from their
+        original public hosts.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that paper does not include experiments requiring code.
@@ -87,7 +141,17 @@
 \item {\bf Experimental setting/details}
     \item[] Question: Does the paper specify all the training and test details (e.g., data splits, hyperparameters, how they were chosen, type of optimizer) necessary to understand the results?
     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: Docker, seed-ledger, anon repo.
+    \item[] Justification: Hyperparameters are specified at point-of-use:
+        \cref{sec:fwsdp} documents the Frank--Wolfe iteration budget,
+        line-search rule, low-rank storage dimension, and rounding
+        hyperplane count; supplementary \cref{sec:qaoa} documents \QAOA
+        depth ($p{=}1$), shot counts, and parameter-optimisation grid;
+        supplementary \cref{sec:dispatcher} documents twin-width
+        thresholds and cograph-routing predicates; supplementary
+        \cref{sec:ilp} documents the \textsc{HiGHS} \MILP configuration.
+        Every run records its random seed and full configuration via the
+        seed-ledger audit trail so that the precise hyperparameter state
+        of any figure can be recovered.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper does not include experiments.
@@ -98,7 +162,16 @@
 \item {\bf Experiment statistical significance}
     \item[] Question: Does the paper report error bars suitably and correctly defined or other appropriate information about the statistical significance of the experiments?
     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: Docker, seed-ledger, anon repo.
+    \item[] Justification: The anytime-curve figures (supplementary
+        \cref{sec:anytime}) show shaded bands aggregated over five
+        independent seeds per instance; the band min/max / mean are
+        defined in the caption. The combined leaderboard (supplementary
+        \cref{sec:leaderboard}) reports best and mean values across the
+        same five-seed draw. The hardware calibration-mirror error is
+        reported as a measured interval ($1.6$--$2.9\%$) rather than a
+        point estimate. The dominant source of variance (random seed of
+        the solver ensemble and of \QAOA parameter initialisation) is
+        stated explicitly in the captions.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper does not include experiments.
@@ -115,19 +188,37 @@
 \item {\bf Experiments compute resources}
     \item[] Question: For each experiment, does the paper provide sufficient information on the computer resources (type of compute workers, memory, time of execution) needed to reproduce the experiments?
     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: §FW-SDP eq:fw-objective + §SDP-scaling weak duality.
+    \item[] Justification: The abstract states the commodity hardware
+        target (``GTX\,1650-class GPU, 16\,GB RAM''). \cref{sec:hardware}
+        gives the device details for the quantum run
+        (\textsc{ibm\_kingston} Eagle/Heron). Supplementary
+        \cref{sec:repro} re-states the workstation specification, the
+        Python 3.12-slim Docker image, and reports that the full
+        ${\gtrsim}500$-test suite runs in under two minutes on that
+        pinned container. Dead-end or preliminary experiments are
+        acknowledged in the ``Discussion and limitations'' section
+        (signed BiqMac exploration, $p{=}1$ \QAOA ceiling analysis).
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper does not include experiments.
         \item The paper should indicate the type of compute workers CPU or GPU, internal cluster, or cloud provider, including relevant memory and storage.
-        \item The paper should provide the amount of compute required for each of the individual experimental runs as well as estimate the total compute. 
-        \item The paper should disclose whether the full research project required more compute than the experiments reported in the paper (e.g., preliminary or failed experiments that didn't make it into the paper). 
+        \item The paper should provide the amount of compute required for each of the individual experimental runs as well as estimate the total compute.
+        \item The paper should disclose whether the full research project required more compute than the experiments reported in the paper (e.g., preliminary or failed experiments that didn't make it into the paper).
     \end{itemize}
-    
+
 \item {\bf Code of ethics}
     \item[] Question: Does the research conducted in the paper conform, in every respect, with the NeurIPS Code of Ethics \url{https://neurips.cc/public/EthicsGuidelines}?
     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: anonymous.4open.science link.
+    \item[] Justification: The research is purely algorithmic and
+        operates on synthetic graphs and public benchmark instances
+        (Gset, BiqMac, DIMACS); no human-subject data, crowdsourced
+        annotations, or scraped personal data are involved. Quantum
+        hardware access is via the authors' own \textsc{IBM Quantum}
+        account; the API token is held outside the project directory and
+        never checked into the repository. The paper includes a
+        ``Broader Impact'' section that explicitly discusses dual-use
+        and mitigation. Anonymity is preserved for review (see the
+        anonymised code-mirror referenced in the main paper).
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the authors have not reviewed the NeurIPS Code of Ethics.
@@ -139,7 +230,17 @@
 \item {\bf Broader impacts}
     \item[] Question: Does the paper discuss both potential positive societal impacts and negative societal impacts of the work performed?
     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: anonymous.4open.science link.
+    \item[] Justification: The main paper contains a dedicated
+        ``Broader Impact'' section (\cref{sec:broader_impact}) that
+        addresses both sides: positive impacts (open-source Apache-2.0
+        release, container-pinned reproducibility, dual certificates
+        enabling third-party verification of both lower and upper
+        bounds), and a specific negative path (\MaxCut underlies
+        community-detection algorithms that could be used in
+        surveillance or social-network analysis), alongside the chosen
+        mitigation (publishing only benchmark-focused implementations
+        rather than deployment-ready tooling). We see no direct dual-use
+        concerns for the quantum-hardware validation path.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that there is no societal impact of the work performed.
@@ -149,15 +250,20 @@
         \item The authors should consider possible harms that could arise when the technology is being used as intended and functioning correctly, harms that could arise when the technology is being used as intended but gives incorrect results, and harms following from (intentional or unintentional) misuse of the technology.
         \item If there are negative societal impacts, the authors could also discuss possible mitigation strategies (e.g., gated release of models, providing defenses in addition to attacks, mechanisms for monitoring misuse, mechanisms to monitor how a system learns from feedback over time, improving the efficiency and accessibility of ML).
     \end{itemize}
-    
+
 \item {\bf Safeguards}
     \item[] Question: Does the paper describe safeguards that have been put in place for responsible release of data or models that have a high risk for misuse (e.g., pre-trained language models, image generators, or scraped datasets)?
     \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: No released model to safeguard.
+    \item[] Justification: The released asset is a combinatorial
+        optimisation library that operates on benchmark graph instances;
+        no pre-trained generative model, language model, image
+        generator, or scraped dataset is released. Standard
+        open-source distribution safeguards (Apache-2.0 licensing,
+        dependency pinning, seed-ledger audit trail) apply.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper poses no such risks.
-        \item Released models that have a high risk for misuse or dual-use should be released with necessary safeguards to allow for controlled use of the model, for example by requiring that users adhere to usage guidelines or restrictions to access the model or implementing safety filters. 
+        \item Released models that have a high risk for misuse or dual-use should be released with necessary safeguards to allow for controlled use of the model, for example by requiring that users adhere to usage guidelines or restrictions to access the model or implementing safety filters.
         \item Datasets that have been scraped from the Internet could pose safety risks. The authors should describe how they avoided releasing unsafe images.
         \item We recognize that providing effective safeguards is challenging, and many papers do not require this, but we encourage authors to take this into account and make a best faith effort.
     \end{itemize}
@@ -165,7 +271,17 @@
 \item {\bf Licenses for existing assets}
     \item[] Question: Are the creators or original owners of assets (e.g., code, data, models), used in the paper, properly credited and are the license and terms of use explicitly mentioned and properly respected?
     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: Apache-2.0, cvxpy/qiskit/networkx credited.
+    \item[] Justification: All third-party software dependencies
+        (\texttt{cvxpy}, \texttt{qiskit}, \texttt{qiskit-ibm-runtime},
+        \texttt{networkx}, \textsc{HiGHS}, \texttt{scipy},
+        \texttt{numpy}, \texttt{Docker}) are cited in the bibliography
+        at first technical use and version-pinned in the companion
+        repository's \texttt{requirements.txt} and \texttt{pyproject.toml}
+        (supplementary \cref{sec:repro}); benchmark libraries (Gset,
+        BiqMac, DIMACS) are cited at first use. All dependencies are
+        used under permissive open-source licenses compatible with our
+        Apache-2.0 release; a \texttt{LICENSE} file and third-party
+        notices live at the root of the companion repository.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper does not use existing assets.
@@ -181,43 +297,67 @@
 \item {\bf New assets}
     \item[] Question: Are new assets introduced in the paper well documented and is the documentation provided alongside the assets?
     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: Apache-2.0, cvxpy/qiskit/networkx credited.
+    \item[] Justification: The new asset is the \ZornQ codebase,
+        released under the Apache-2.0 license via the anonymised
+        review-time mirror noted in the main paper's ``Data and code
+        availability'' section. Documentation comprises the pinned
+        \texttt{requirements.txt} and \texttt{pyproject.toml}, the
+        \texttt{Dockerfile} and \texttt{environment.yml}, a top-level
+        \texttt{README} describing the solver-ensemble entrypoints
+        (\texttt{solve}, \texttt{features}, \texttt{version}), per-module
+        docstrings, usage examples for the deterministic seed-ledger,
+        and the ${\gtrsim}500$-test suite that can be executed inside
+        the pinned container. All review-time assets are anonymised.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper does not release new assets.
-        \item Researchers should communicate the details of the dataset\slash code\slash model as part of their submissions via structured templates. This includes details about training, license, limitations, etc. 
+        \item Researchers should communicate the details of the dataset\slash code\slash model as part of their submissions via structured templates. This includes details about training, license, limitations, etc.
         \item The paper should discuss whether and how consent was obtained from people whose asset is used.
         \item At submission time, remember to anonymize your assets (if applicable). You can either create an anonymized URL or include an anonymized zip file.
     \end{itemize}
 
 \item {\bf Crowdsourcing and research with human subjects}
-    \item[] Question: For crowdsourcing experiments and research with human subjects, does the paper include the full text of instructions given to participants and screenshots, if applicable, as well as details about compensation (if any)? 
-    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: §Discussion paragraphs on signed FW, p=1 ceiling, cograph-only.
+    \item[] Question: For crowdsourcing experiments and research with human subjects, does the paper include the full text of instructions given to participants and screenshots, if applicable, as well as details about compensation (if any)?
+    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: This work involves no crowdsourcing and no
+        human-subject research; all experiments run over synthetic
+        graphs, publicly-available benchmark instances (Gset, BiqMac,
+        DIMACS), or the authors' own \textsc{IBM Quantum} hardware
+        submissions via Qiskit Runtime.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper does not involve crowdsourcing nor research with human subjects.
-        \item Including this information in the supplemental material is fine, but if the main contribution of the paper involves human subjects, then as much detail as possible should be included in the main paper. 
-        \item According to the NeurIPS Code of Ethics, workers involved in data collection, curation, or other labor should be paid at least the minimum wage in the country of the data collector. 
+        \item Including this information in the supplemental material is fine, but if the main contribution of the paper involves human subjects, then as much detail as possible should be included in the main paper.
+        \item According to the NeurIPS Code of Ethics, workers involved in data collection, curation, or other labor should be paid at least the minimum wage in the country of the data collector.
     \end{itemize}
 
 \item {\bf Institutional review board (IRB) approvals or equivalent for research with human subjects}
     \item[] Question: Does the paper describe potential risks incurred by study participants, whether such risks were disclosed to the subjects, and whether Institutional Review Board (IRB) approvals (or an equivalent approval/review based on the requirements of your country or institution) were obtained?
-    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: anonymous.4open.science link.
+    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: This work involves no human-subject research,
+        so IRB or equivalent review does not apply. All experiments use
+        synthetic graphs or public benchmark instances, plus the
+        authors' own quantum-hardware submissions.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper does not involve crowdsourcing nor research with human subjects.
-        \item Depending on the country in which research is conducted, IRB approval (or equivalent) may be required for any human subjects research. If you obtained IRB approval, you should clearly state this in the paper. 
-        \item We recognize that the procedures for this may vary significantly between institutions and locations, and we expect authors to adhere to the NeurIPS Code of Ethics and the guidelines for their institution. 
+        \item Depending on the country in which research is conducted, IRB approval (or equivalent) may be required for any human subjects research. If you obtained IRB approval, you should clearly state this in the paper.
+        \item We recognize that the procedures for this may vary significantly between institutions and locations, and we expect authors to adhere to the NeurIPS Code of Ethics and the guidelines for their institution.
         \item For initial submissions, do not include any information that would break anonymity (if applicable), such as the institution conducting the review.
     \end{itemize}
 
 \item {\bf Declaration of LLM usage}
     \item[] Question: Does the paper describe the usage of LLMs if it is an important, original, or non-standard component of the core methods in this research? Note that if the LLM is used only for writing, editing, or formatting purposes and does \emph{not} impact the core methodology, scientific rigor, or originality of the research, declaration is not required.
-    %this research? 
-    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: anonymous.4open.science link.
+    %this research?
+    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: LLMs were not used as an important, original,
+        or non-standard component of the core methodology. The
+        algorithmic ingredients of \ZornQ (Frank--Wolfe sandwich \SDP,
+        twin-width dispatcher, cograph dynamic program, QAOA with
+        calibration-mirror) are classical/quantum numerical methods;
+        any LLM assistance was limited to writing, editing, and code
+        iteration support, for which per the NeurIPS LLM policy
+        declaration is not required.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the core method development in this research does not involve LLMs as any important, original, or non-standard components.
